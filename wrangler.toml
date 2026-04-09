@@ -1,0 +1,17 @@
+name = "json-formatter"
+compatibility_date = "2024-01-01"
+
+# Cloudflare Pages configuration
+[site]
+bucket = "./dist"
+
+# Build configuration
+[build]
+command = "npm run build"
+
+# Environment variables (these will be set in Cloudflare dashboard)
+[env.production]
+name = "json-formatter"
+
+[env.production.vars]
+NODE_ENV = "production"

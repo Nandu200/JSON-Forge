@@ -1,0 +1,9 @@
+# Cloudflare Pages headers
+
+# Cache static assets
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML files should not be cached
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate

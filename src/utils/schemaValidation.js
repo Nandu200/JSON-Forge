@@ -582,6 +582,7 @@ function fixUnquotedStrings(str) {
 /**
  * Fix missing commas between elements - context-aware, handles all JSON structures
  * Works for: arrays of objects, arrays of arrays, nested structures, etc.
+ * Consumes strings and numbers as whole tokens to avoid inserting commas within them.
  */
 function fixMissingCommas(str) {
   let result = '';
@@ -591,14 +592,12 @@ function fixMissingCommas(str) {
   while (i < str.length) {
     const ch = str[i];
 
-    // Handle strings: check for missing comma BEFORE the opening quote
+    // Handle strings: consume as a whole token
     if (ch === '"') {
-      // Check if we need a comma before this string starts
       if (needsCommaBefore(lastSignificantChar)) {
         result += ',';
       }
 
-      // Read the full string
       let s = '"';
       i++;
       while (i < str.length) {
@@ -626,17 +625,43 @@ function fixMissingCommas(str) {
       continue;
     }
 
-    // Handle scientific notation: e/E after a digit is part of the number
-    if ((ch === 'e' || ch === 'E') && /\d/.test(lastSignificantChar)) {
-      result += ch;
-      i++;
-      if (i < str.length && (str[i] === '+' || str[i] === '-')) {
-        result += str[i];
+    // Handle numbers: consume the entire number as a single token
+    // (digits, decimal point, exponent) to avoid inserting commas within them
+    if (/\d/.test(ch) || (ch === '-' && i + 1 < str.length && /[\d.]/.test(str[i + 1]))) {
+      if (needsCommaBefore(lastSignificantChar)) {
+        result += ',';
+      }
+      // Optional negative sign
+      if (ch === '-') {
+        result += ch;
         i++;
       }
+      // Integer part
       while (i < str.length && /\d/.test(str[i])) {
         result += str[i];
         i++;
+      }
+      // Decimal part
+      if (i < str.length && str[i] === '.' && i + 1 < str.length && /\d/.test(str[i + 1])) {
+        result += str[i];
+        i++;
+        while (i < str.length && /\d/.test(str[i])) {
+          result += str[i];
+          i++;
+        }
+      }
+      // Exponent part (e.g., 1e5, 1.5E-3)
+      if (i < str.length && (str[i] === 'e' || str[i] === 'E')) {
+        result += str[i];
+        i++;
+        if (i < str.length && (str[i] === '+' || str[i] === '-')) {
+          result += str[i];
+          i++;
+        }
+        while (i < str.length && /\d/.test(str[i])) {
+          result += str[i];
+          i++;
+        }
       }
       lastSignificantChar = result[result.length - 1];
       continue;
@@ -644,10 +669,6 @@ function fixMissingCommas(str) {
 
     // Check for missing comma before value-starting tokens
     if ((ch === '{' || ch === '[') && needsCommaBefore(lastSignificantChar)) {
-      result += ',';
-    }
-    // Number or negative starting after a value ender
-    else if ((/\d/.test(ch) || ch === '-') && needsCommaBefore(lastSignificantChar)) {
       result += ',';
     }
     // true/false/null starting after a value ender
