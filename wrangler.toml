@@ -10,7 +10,7 @@ command = "npm run build"
 
 # Environment variables (these will be set in Cloudflare dashboard)
 [env.production]
-name = "json-formatter"
+name = "prettyjson"
 
 [env.production.vars]
 NODE_ENV = "production"
