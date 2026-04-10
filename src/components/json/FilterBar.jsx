@@ -62,14 +62,14 @@ export default function FilterBar({
             ? 'bg-white border-slate-200' 
             : 'bg-white/[0.04] border-white/[0.06]'
         }`}>
-          <Search size={12} className={`flex-shrink-0 ${isLight ? 'text-slate-400' : 'text-slate-500'}`} />
+          <Search size={14} className={`flex-shrink-0 ${isLight ? 'text-slate-400' : 'text-slate-500'}`} />
           <input
             type="text"
             value={filter}
             onChange={e => onFilterChange(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={showPathFilter ? "Search keys & values..." : "Search..."}
-            className={`bg-transparent text-[11px] font-mono outline-none w-full ${
+            className={`bg-transparent text-[12px] font-mono outline-none w-full ${
               isLight 
                 ? 'text-slate-700 placeholder-slate-400' 
                 : 'text-slate-300 placeholder-slate-600'
@@ -77,7 +77,7 @@ export default function FilterBar({
           />
           {filter && (
             <button onClick={() => onFilterChange('')} className={isLight ? 'text-slate-400 hover:text-slate-600' : 'text-slate-600 hover:text-slate-400'}>
-              <X size={12} />
+              <X size={14} />
             </button>
           )}
         </div>
@@ -96,9 +96,9 @@ export default function FilterBar({
                 }`}
                 title="Previous match (Shift+Enter)"
               >
-                <ChevronLeft size={14} />
+                <ChevronLeft size={16} />
               </button>
-              <span className={`text-[10px] font-mono min-w-[40px] text-center ${
+              <span className={`text-[11px] font-mono min-w-[40px] text-center ${
                 isLight ? 'text-slate-500' : 'text-slate-500'
               }`}>
                 {searchMatchCount > 0 ? `${currentMatchIndex + 1}/${searchMatchCount}` : '0/0'}
@@ -113,7 +113,7 @@ export default function FilterBar({
                 }`}
                 title="Next match (Enter)"
               >
-                <ChevronRight size={14} />
+                <ChevronRight size={16} />
               </button>
             </div>
 
@@ -121,13 +121,13 @@ export default function FilterBar({
             {showReplaceButton && (
               <button 
                 onClick={() => setShowReplace(!showReplace)}
-                className={`flex items-center gap-1 px-2 h-6 text-[10px] font-mono rounded transition-all ${
+                className={`flex items-center gap-1 px-2 h-6 text-[11px] font-mono rounded transition-all ${
                   showReplace 
                     ? (isLight ? 'bg-blue-100 text-blue-600' : 'bg-blue-600/20 text-blue-400')
                     : (isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-500 hover:text-slate-300')
                 }`}
               >
-                <Replace size={12} />
+                <Replace size={13} />
                 Replace
               </button>
             )}
@@ -152,14 +152,14 @@ export default function FilterBar({
                     : (isLight ? 'text-slate-500 hover:text-slate-700 hover:bg-slate-100' : 'text-slate-600 hover:text-slate-400 hover:bg-white/[0.04]')
                 }`}
               >
-                <s.icon size={12} />
+                <s.icon size={14} />
               </button>
             ))}
           </div>
         )}
 
         {/* Case Sensitive Toggle */}
-        <label className={`flex items-center gap-1.5 text-[10px] font-mono cursor-pointer ml-auto ${
+        <label className={`flex items-center gap-1.5 text-[11px] font-mono cursor-pointer ml-auto ${
           isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-500 hover:text-slate-300'
         }`}>
           <input
@@ -181,7 +181,7 @@ export default function FilterBar({
                 : (isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-500 hover:text-slate-300')
             }`}
           >
-            <Filter size={11} />
+            <Filter size={13} />
             Path
           </button>
         )}

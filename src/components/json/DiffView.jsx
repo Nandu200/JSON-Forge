@@ -86,8 +86,8 @@ function DiffPanel({ label, lines, diffLines, side, scrollRef, onScroll, isLight
       {/* Panel Header */}
       <div className="flex items-center justify-between px-4 py-2 border-b flex-shrink-0"
         style={{ background: isLight ? '#f8fafc' : '#161b22', borderColor: isLight ? '#e2e8f0' : 'rgba(255,255,255,0.05)' }}>
-        <span className="text-[11px] font-mono font-medium" style={{ color: isLight ? '#334155' : '#cbd5e1' }}>{label}</span>
-        <span className="text-[10px] font-mono" style={{ color: isLight ? '#94a3b8' : '#64748b' }}>{lines.length} lines</span>
+        <span className="text-[12px] font-mono font-medium" style={{ color: isLight ? '#1e293b' : '#e2e8f0' }}>{label}</span>
+        <span className="text-[11px] font-mono" style={{ color: isLight ? '#64748b' : '#94a3b8' }}>{lines.length} lines</span>
       </div>
       {/* Panel Content */}
       <div className="flex-1 overflow-auto" ref={scrollRef} onScroll={onScroll}>
@@ -97,7 +97,7 @@ function DiffPanel({ label, lines, diffLines, side, scrollRef, onScroll, isLight
           const isEmpty = line === null;
 
           let bg = '';
-          let textColor = isLight ? '#334155' : '#cbd5e1';
+          let textColor = isLight ? '#1e293b' : '#e2e8f0';
           let gutterColor = isLight ? '#94a3b8' : '#64748b';
           let gutterBg = '';
           let marker = ' ';
@@ -126,7 +126,7 @@ function DiffPanel({ label, lines, diffLines, side, scrollRef, onScroll, isLight
           }
 
           return (
-            <div key={idx} className="flex font-mono text-[12px] leading-[20px]" style={{ background: bg }}>
+            <div key={idx} className="flex font-mono text-[13px] leading-[22px]" style={{ background: bg }}>
               <span className="w-10 text-right pr-2 select-none flex-shrink-0" style={{ background: gutterBg, color: gutterColor }}>
                 {lineNum ?? ''}
               </span>
@@ -185,7 +185,7 @@ export default function DiffView({ leftData, rightData, leftValue = '', rightVal
     return (
       <div className="flex items-center justify-center h-full flex-col gap-3">
         <GitCompare size={28} style={{ color: isLight ? '#94a3b8' : '#475569' }} />
-        <span className="text-[11px] font-mono tracking-widest uppercase" style={{ color: isLight ? '#64748b' : '#64748b' }}>
+          <span className="text-[12px] font-mono tracking-widest uppercase" style={{ color: isLight ? '#64748b' : '#64748b' }}>
           Provide valid JSON in both panels
         </span>
       </div>
@@ -198,8 +198,8 @@ export default function DiffView({ leftData, rightData, leftValue = '', rightVal
         <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: isLight ? 'rgba(16,185,129,0.08)' : 'rgba(16,185,129,0.1)' }}>
           <GitCompare size={20} style={{ color: isLight ? '#059669' : '#34d399' }} />
         </div>
-        <span className="text-[12px] font-mono" style={{ color: isLight ? '#059669' : '#34d399' }}>Identical JSON</span>
-        <span className="text-[10px] font-mono" style={{ color: isLight ? '#94a3b8' : '#64748b' }}>No differences found</span>
+        <span className="text-[13px] font-mono" style={{ color: isLight ? '#059669' : '#34d399' }}>Identical JSON</span>
+        <span className="text-[11px] font-mono" style={{ color: isLight ? '#64748b' : '#94a3b8' }}>No differences found</span>
       </div>
     );
   }
@@ -212,18 +212,18 @@ export default function DiffView({ leftData, rightData, leftValue = '', rightVal
       <div className="flex-shrink-0 flex items-center justify-between px-4 py-1.5 border-b"
         style={{ background: isLight ? '#f8fafc' : '#161b22', borderColor: isLight ? '#e2e8f0' : 'rgba(255,255,255,0.05)' }}>
         <div className="flex items-center gap-3">
-          <GitCompare size={13} style={{ color: isLight ? '#94a3b8' : '#64748b' }} />
-          <span className="text-[11px] font-mono" style={{ color: isLight ? '#475569' : '#94a3b8' }}>{totalChanges} change{totalChanges !== 1 ? 's' : ''}</span>
+          <GitCompare size={14} style={{ color: isLight ? '#64748b' : '#94a3b8' }} />
+          <span className="text-[12px] font-mono" style={{ color: isLight ? '#334155' : '#cbd5e1' }}>{totalChanges} change{totalChanges !== 1 ? 's' : ''}</span>
         </div>
         <div className="flex items-center gap-3">
           {stats.removed > 0 && (
-            <span className="text-[10px] font-mono" style={{ color: isLight ? '#dc2626' : '#f87171' }}>−{stats.removed} removed</span>
+            <span className="text-[11px] font-mono" style={{ color: isLight ? '#dc2626' : '#f87171' }}>−{stats.removed} removed</span>
           )}
           {stats.added > 0 && (
-            <span className="text-[10px] font-mono" style={{ color: isLight ? '#059669' : '#34d399' }}>+{stats.added} added</span>
+            <span className="text-[11px] font-mono" style={{ color: isLight ? '#059669' : '#34d399' }}>+{stats.added} added</span>
           )}
           {stats.modified > 0 && (
-            <span className="text-[10px] font-mono" style={{ color: isLight ? '#d97706' : '#fbbf24' }}>~{stats.modified} modified</span>
+            <span className="text-[11px] font-mono" style={{ color: isLight ? '#d97706' : '#fbbf24' }}>~{stats.modified} modified</span>
           )}
         </div>
       </div>

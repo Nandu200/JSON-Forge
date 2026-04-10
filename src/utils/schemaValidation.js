@@ -68,11 +68,20 @@ export function validateAgainstSchema(data, schema, path = 'root') {
       });
     }
     if (schema.pattern) {
-      const regex = new RegExp(schema.pattern);
-      if (!regex.test(data)) {
+      try {
+        const regex = new RegExp(schema.pattern);
+        if (!regex.test(data)) {
+          errors.push({
+            path,
+            message: `String does not match pattern "${schema.pattern}"`,
+            value: data,
+            schemaPath: `${path}.pattern`
+          });
+        }
+      } catch (e) {
         errors.push({
           path,
-          message: `String does not match pattern "${schema.pattern}"`,
+          message: `Invalid regex pattern "${schema.pattern}": ${e.message}`,
           value: data,
           schemaPath: `${path}.pattern`
         });

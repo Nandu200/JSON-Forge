@@ -133,7 +133,7 @@ export default function TreeView({ data, filter = '', pathFilter = '', sort = 'n
   if (filteredData === null || filteredData === undefined) {
     return (
       <div className="flex items-center justify-center h-full">
-        <span className="text-[11px] font-mono text-slate-600 tracking-widest uppercase">No valid JSON</span>
+        <span className="text-[12px] font-mono text-slate-500 tracking-widest uppercase">No valid JSON</span>
       </div>
     );
   }
@@ -144,7 +144,7 @@ export default function TreeView({ data, filter = '', pathFilter = '', sort = 'n
       <div className="flex-shrink-0 h-9 flex items-center px-4 border-b border-white/[0.04]">
         <span className="breadcrumb-path">
           {pathFilter && (
-            <span className="text-blue-400 text-[10px] font-mono mr-2">
+            <span className="text-blue-400 text-[11px] font-mono mr-2">
               {pathFilter} ›
             </span>
           )}
@@ -155,7 +155,7 @@ export default function TreeView({ data, filter = '', pathFilter = '', sort = 'n
                   {i < arr.length - 1 && <span className="mx-1 text-slate-700"> › </span>}
                 </span>
               ))
-            : <span className="text-slate-700">Hover a node to see path</span>
+            : <span className="text-slate-500">Hover a node to see path</span>
           }
         </span>
       </div>
