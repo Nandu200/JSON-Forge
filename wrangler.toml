@@ -1,9 +1,8 @@
-name = "json-formatter"
-compatibility_date = "2024-01-01"
+name = "prettyjson"
+compatibility_date = "2026-03-31"
 
-# Cloudflare Pages configuration
-[site]
-bucket = "./dist"
+[assets]
+directory = "dist"
 
 # Build configuration
 [build]
