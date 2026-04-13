@@ -12,6 +12,7 @@ import FilterBar from '@/components/json/FilterBar';
 import ExportDialog from '@/components/json/ExportDialog';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import GoogleAd from '@/components/GoogleAd';
+import PrivacyPolicy from '@/components/PrivacyPolicy';
 import { LayoutPanelLeft, Columns2, Copy, Check, Trash2, Minimize2, AlertCircle, CheckCircle2, Wrench, Eye, Upload, Undo2, Redo2, X, ClipboardPaste } from 'lucide-react';
 
 function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedData, theme, validationErrors = [], onValidationErrorsChange }) {
@@ -622,6 +623,7 @@ export default function JsonFormatter() {
   const [layout, setLayout] = useState('single');
   const [theme, setTheme] = useState('light');
   const [showAd, setShowAd] = useState(true);
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   const isLight = theme === 'light';
   // Improved color palette with better contrast
@@ -695,16 +697,6 @@ export default function JsonFormatter() {
         </span>
       </div>
 
-      {/* Top leaderboard ad — desktop only */}
-      <div className="hidden sm:flex flex-shrink-0 justify-center border-b px-3 py-1.5"
-        style={{ borderColor, background: isLight ? '#f1f5f9' : '#0f172a' }}>
-        <GoogleAd
-          adSlot={import.meta.env.VITE_AD_SLOT_BOTTOM}
-          style={{ display: 'block', width: '100%', maxWidth: '728px', height: '90px' }}
-          adFormat="horizontal"
-        />
-      </div>
-
       {/* Panels + right sidebar ad */}
       <div className="flex-1 overflow-hidden flex">
         <div className="flex-1 overflow-hidden p-2 sm:p-3 gap-2 sm:gap-3 flex flex-col sm:flex-row">
@@ -749,43 +741,17 @@ export default function JsonFormatter() {
           )}
         </div>
 
-        {/* Right sidebar ads — desktop only */}
-        <div className="hidden lg:flex flex-col flex-shrink-0 w-[300px] p-3 pl-0 gap-3 items-start overflow-y-auto">
+        {/* Right sidebar ad — desktop only */}
+        <div className="hidden lg:flex flex-col flex-shrink-0 w-[300px] p-3 pl-0 gap-3 items-start">
           <div className="w-full rounded-xl overflow-hidden border" style={{ borderColor }}>
             <GoogleAd
               adSlot={import.meta.env.VITE_AD_SLOT_TOP}
               style={{ display: 'block', width: '300px', height: '250px' }}
               adFormat="rectangle"
-              fullWidthResponsive={false}
-            />
-          </div>
-          <div className="w-full rounded-xl overflow-hidden border" style={{ borderColor }}>
-            <GoogleAd
-              adSlot={import.meta.env.VITE_AD_SLOT_BOTTOM}
-              style={{ display: 'block', width: '300px', height: '250px' }}
-              adFormat="rectangle"
-              fullWidthResponsive={false}
-            />
-          </div>
-          <div className="w-full rounded-xl overflow-hidden border" style={{ borderColor }}>
-            <GoogleAd
-              adSlot={import.meta.env.VITE_AD_SLOT_TOP}
-              style={{ display: 'block', width: '300px', height: '600px' }}
-              adFormat="vertical"
               fullWidthResponsive={false}
             />
           </div>
         </div>
-      </div>
-
-      {/* Mobile-only ad — shown below panels on small screens */}
-      <div className="flex lg:hidden flex-shrink-0 justify-center border-t px-3 py-1.5"
-        style={{ borderColor, background: isLight ? '#f1f5f9' : '#0f172a' }}>
-        <GoogleAd
-          adSlot={import.meta.env.VITE_AD_SLOT_TOP}
-          style={{ display: 'block', width: '100%', maxWidth: '320px', height: '100px' }}
-          adFormat="horizontal"
-        />
       </div>
 
       {/* Dismissible bottom ad — all screen sizes */}
@@ -818,6 +784,14 @@ export default function JsonFormatter() {
         style={{ background: bg0, borderColor }}>
         <div className="flex items-center gap-3">
           <span className="text-[11px] font-mono" style={{ color: isLight ? '#64748b' : '#64748b' }}>PrettyJSON v1.0</span>
+          <span style={{ color: isLight ? '#cbd5e1' : '#334155' }}>·</span>
+          <button
+            onClick={() => setShowPrivacy(true)}
+            className="text-[11px] font-mono hover:underline"
+            style={{ color: isLight ? '#64748b' : '#64748b' }}
+          >
+            Privacy Policy
+          </button>
         </div>
         <div className="flex items-center gap-4">
           {leftData && (
@@ -832,6 +806,9 @@ export default function JsonFormatter() {
           )}
         </div>
       </div>
+
+      {/* Privacy Policy Modal */}
+      <PrivacyPolicy open={showPrivacy} onClose={() => setShowPrivacy(false)} theme={theme} />
     </div>
   );
 }
