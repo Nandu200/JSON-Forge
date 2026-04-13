@@ -695,6 +695,16 @@ export default function JsonFormatter() {
         </span>
       </div>
 
+      {/* Top leaderboard ad — desktop only */}
+      <div className="hidden sm:flex flex-shrink-0 justify-center border-b px-3 py-1.5"
+        style={{ borderColor, background: isLight ? '#f1f5f9' : '#0f172a' }}>
+        <GoogleAd
+          adSlot={import.meta.env.VITE_AD_SLOT_BOTTOM}
+          style={{ display: 'block', width: '100%', maxWidth: '728px', height: '90px' }}
+          adFormat="horizontal"
+        />
+      </div>
+
       {/* Panels + right sidebar ad */}
       <div className="flex-1 overflow-hidden flex">
         <div className="flex-1 overflow-hidden p-2 sm:p-3 gap-2 sm:gap-3 flex flex-col sm:flex-row">
@@ -739,8 +749,8 @@ export default function JsonFormatter() {
           )}
         </div>
 
-        {/* Right sidebar ad — desktop only */}
-        <div className="hidden lg:flex flex-shrink-0 w-[300px] p-3 pl-0 items-start">
+        {/* Right sidebar ads — desktop only */}
+        <div className="hidden lg:flex flex-col flex-shrink-0 w-[300px] p-3 pl-0 gap-3 items-start overflow-y-auto">
           <div className="w-full rounded-xl overflow-hidden border" style={{ borderColor }}>
             <GoogleAd
               adSlot={import.meta.env.VITE_AD_SLOT_TOP}
@@ -749,7 +759,33 @@ export default function JsonFormatter() {
               fullWidthResponsive={false}
             />
           </div>
+          <div className="w-full rounded-xl overflow-hidden border" style={{ borderColor }}>
+            <GoogleAd
+              adSlot={import.meta.env.VITE_AD_SLOT_BOTTOM}
+              style={{ display: 'block', width: '300px', height: '250px' }}
+              adFormat="rectangle"
+              fullWidthResponsive={false}
+            />
+          </div>
+          <div className="w-full rounded-xl overflow-hidden border" style={{ borderColor }}>
+            <GoogleAd
+              adSlot={import.meta.env.VITE_AD_SLOT_TOP}
+              style={{ display: 'block', width: '300px', height: '600px' }}
+              adFormat="vertical"
+              fullWidthResponsive={false}
+            />
+          </div>
         </div>
+      </div>
+
+      {/* Mobile-only ad — shown below panels on small screens */}
+      <div className="flex lg:hidden flex-shrink-0 justify-center border-t px-3 py-1.5"
+        style={{ borderColor, background: isLight ? '#f1f5f9' : '#0f172a' }}>
+        <GoogleAd
+          adSlot={import.meta.env.VITE_AD_SLOT_TOP}
+          style={{ display: 'block', width: '100%', maxWidth: '320px', height: '100px' }}
+          adFormat="horizontal"
+        />
       </div>
 
       {/* Dismissible bottom ad — all screen sizes */}

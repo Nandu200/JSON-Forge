@@ -2,15 +2,6 @@ import { useEffect, useRef } from 'react';
 
 /**
  * Google AdSense Ad Component
- * 
- * Usage:
- * <GoogleAd 
- *   adSlot="YOUR_AD_SLOT_ID" 
- *   style={{ display: 'block', width: '100%', height: '250px' }}
- * />
- * 
- * Note: Make sure to replace YOUR_ADSENSE_CLIENT_ID in index.html
- * and YOUR_AD_SLOT_ID when using this component.
  */
 export default function GoogleAd({ 
   adSlot, 
@@ -19,46 +10,36 @@ export default function GoogleAd({
   fullWidthResponsive = true 
 }) {
   const adRef = useRef(null);
+  const pushed = useRef(false);
   const adsEnabled = import.meta.env.VITE_ADS_ENABLED !== 'false';
   const clientId = import.meta.env.VITE_ADSENSE_CLIENT;
 
   useEffect(() => {
-    if (!adsEnabled || typeof window === 'undefined') return;
+    if (!adsEnabled || !adSlot || pushed.current) return;
     
-    // Check if adsbygoogle is loaded
-    if (!window.adsbygoogle) {
-      console.warn('Google AdSense not loaded. Make sure to add your client ID in index.html');
-      return;
-    }
+    // Wait for adsbygoogle script to load
+    const tryPush = () => {
+      if (!window.adsbygoogle) return false;
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        pushed.current = true;
+      } catch (error) {
+        // AdSense may throw if ad slot is already filled or blocked
+        console.error('AdSense push error:', error);
+      }
+      return true;
+    };
 
-    try {
-      // Push the ad to AdSense
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (error) {
-      console.error('Error loading Google Ad:', error);
+    // Try immediately, retry after short delay if script not loaded yet
+    if (!tryPush()) {
+      const timer = setTimeout(tryPush, 1500);
+      return () => clearTimeout(timer);
     }
-  }, []);
+  }, [adsEnabled, adSlot]);
 
   // Don't render if ads disabled or no ad slot provided
-  if (!adsEnabled || !adSlot || adSlot === 'YOUR_AD_SLOT_ID') {
-    return (
-      <div 
-        style={{
-          ...style,
-          background: 'rgba(255,255,255,0.05)',
-          border: '2px dashed rgba(255,255,255,0.1)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100px',
-          borderRadius: '8px'
-        }}
-      >
-        <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', fontFamily: 'monospace' }}>
-          Ad Placeholder - Add your ad slot ID
-        </span>
-      </div>
-    );
+  if (!adsEnabled || !adSlot) {
+    return null;
   }
 
   return (
