@@ -954,10 +954,10 @@ export default function JsonFormatter() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="md:col-span-2 space-y-8">
               <section>
-                <h1 className="text-3xl font-bold mb-4" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Free Online JSON Formatter & Validator</h1>
+                <h1 className="text-3xl font-bold mb-4" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Free Online JSON Formatter to Prettify JSON</h1>
                 <p className="leading-relaxed mb-4">
-                  PrettyJSON is a powerful, secure, and free online tool designed for developers to format, validate, parse, and edit JSON data. 
-                  Whether you are debugging API responses, formatting configuration files, or comparing JSON payloads, our tool provides an intuitive interface to make your work easier.
+                  PrettyJSON is a powerful, secure, and free online tool designed for developers to format, validate, parse, and <strong>pretty print JSON</strong> data. 
+                  Whether you are debugging API responses, formatting configuration files, or simply need a fast <strong>JSON pretty formatter</strong> to clean up messy payloads, our tool provides an intuitive interface to make your work easier.
                 </p>
                 <p className="leading-relaxed">
                   Unlike other tools, PrettyJSON processes all your data locally in your browser. Your JSON data is never sent to our servers, ensuring complete privacy and security for your sensitive information.
@@ -967,7 +967,7 @@ export default function JsonFormatter() {
               <section>
                 <h2 className="text-xl font-bold mb-3" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Key Features</h2>
                 <ul className="list-disc pl-5 space-y-2">
-                  <li><strong>Format & Beautify:</strong> Instantly convert minified or messy JSON into beautifully indented, readable syntax.</li>
+                  <li><strong>Format & Prettify:</strong> Instantly convert minified or messy strings into beautifully indented, readable syntax with our <strong>pretty print JSON</strong> engine.</li>
                   <li><strong>Validate & Auto-Repair:</strong> Detect syntax errors instantly. Our auto-repair feature can fix common mistakes like missing quotes, trailing commas, and unescaped characters.</li>
                   <li><strong>Tree & Table Views:</strong> Visualize complex nested objects and arrays with our interactive Tree viewer, or flatten your data into a Table.</li>
                   <li><strong>JSON Diff:</strong> Compare two JSON files side-by-side to highlight additions, deletions, and modifications.</li>
