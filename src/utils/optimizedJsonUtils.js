@@ -28,14 +28,12 @@ export function checkSizeLimits(data, path = '', stats = { depth: 0, keys: 0, ma
   stats.keys++;
 
   if (data !== null && typeof data === 'object') {
-    const newDepth = stats.depth + 1;
+    stats.depth++;
     for (const key of Object.keys(data)) {
-      const result = checkSizeLimits(data[key], `${path}.${key}`, { 
-        ...stats, 
-        depth: newDepth 
-      });
+      const result = checkSizeLimits(data[key], `${path}.${key}`, stats);
       if (!result.valid) return result;
     }
+    stats.depth--;
   }
 
   return { valid: true, stats };
@@ -45,6 +43,11 @@ export function checkSizeLimits(data, path = '', stats = { depth: 0, keys: 0, ma
  * Parse JSON with size validation
  */
 export function parseJSONSafe(str) {
+  // Handle empty/whitespace input gracefully
+  if (!str || !str.trim()) {
+    return { data: null, error: null };
+  }
+
   // Check string length first
   if (str.length > SIZE_LIMITS.MAX_STRING_LENGTH) {
     return { 

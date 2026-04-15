@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { formatJSON, minifyJSON } from '@/utils/jsonUtils';
+import { formatJSON, minifyJSON, syntaxHighlight } from '@/utils/jsonUtils';
 import { parseJSONSafe, getDepthSafe, countKeysSafe, SIZE_LIMITS } from '@/utils/optimizedJsonUtils';
 import { autoFixJSON } from '@/utils/schemaValidation';
+import LZString from 'lz-string';
 import TopBar from '@/components/json/TopBar';
 import TreeView from '@/components/json/TreeView';
 import TableView from '@/components/json/TableView';
@@ -13,7 +14,8 @@ import ExportDialog from '@/components/json/ExportDialog';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import GoogleAd from '@/components/GoogleAd';
 import PrivacyPolicy from '@/components/PrivacyPolicy';
-import { LayoutPanelLeft, Columns2, Copy, Check, Trash2, Minimize2, AlertCircle, CheckCircle2, Wrench, Eye, Upload, Undo2, Redo2, X, ClipboardPaste } from 'lucide-react';
+import KeyboardShortcuts from '@/components/json/KeyboardShortcuts';
+import { LayoutPanelLeft, Columns2, Copy, Check, Trash2, Minimize2, AlertCircle, CheckCircle2, Wrench, Eye, Upload, Undo2, Redo2, X, ClipboardPaste, Keyboard, Share2, Link2 } from 'lucide-react';
 
 function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedData, theme, validationErrors = [], onValidationErrorsChange }) {
   const [filter, setFilter] = useState('');
@@ -62,7 +64,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
       historyIndexRef.current--;
       skipHistoryRef.current = true;
       const prevState = historyRef.current[historyIndexRef.current];
-      console.log('[PrettyJSON] Undo', { index: historyIndexRef.current, chars: prevState.length });
+      if (import.meta.env.DEV) console.log('[PrettyJSON] Undo', { index: historyIndexRef.current, chars: prevState.length });
       onChange(prevState);
     }
   }, [onChange]);
@@ -72,7 +74,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
       historyIndexRef.current++;
       skipHistoryRef.current = true;
       const nextState = historyRef.current[historyIndexRef.current];
-      console.log('[PrettyJSON] Redo', { index: historyIndexRef.current, chars: nextState.length });
+      if (import.meta.env.DEV) console.log('[PrettyJSON] Redo', { index: historyIndexRef.current, chars: nextState.length });
       onChange(nextState);
     }
   }, [onChange]);
@@ -158,23 +160,26 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
   const handleReplaceAll = useCallback((searchText, replaceText) => {
     if (!searchText) return;
     let newValue = value;
-    const searchValue = caseSensitive ? value : value.toLowerCase();
-    const searchFilter = caseSensitive ? searchText : searchText.toLowerCase();
-    
-    let index = searchValue.lastIndexOf(searchFilter);
-    while (index !== -1) {
-      newValue = newValue.substring(0, index) + replaceText + newValue.substring(index + searchText.length);
-      index = searchValue.lastIndexOf(searchFilter, index - 1);
-    }
+    // Build a regex for correct case-insensitive replacement
+    const flags = caseSensitive ? 'g' : 'gi';
+    const escaped = searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    newValue = newValue.replace(new RegExp(escaped, flags), replaceText);
     onChange(newValue);
     setFilter('');
   }, [value, onChange, caseSensitive]);
 
   const isLight = theme === 'light';
 
-  const { data, error } = parseJSONSafe(value);
-  const isEmpty = !value.trim();
+  // Use parsedData from parent — avoids redundant parseJSONSafe call
+  const data = parsedData;
+  const error = (!value || !value.trim()) ? null : (parsedData === null ? parseJSONSafe(value).error : null);
+  const isEmpty = !value || !value.trim();
   const lineCount = value ? value.split('\n').length : 1;
+
+  // Optimized line numbers — single pre element instead of thousands of DIVs
+  const lineNumbersText = useMemo(() => {
+    return Array.from({ length: Math.max(lineCount, 1) }, (_, i) => i + 1).join('\n');
+  }, [lineCount]);
 
   // Stats footer - use safe functions for large data
   const stats = useMemo(() => {
@@ -192,33 +197,28 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
   const handleFormat = useCallback(() => {
     const { formatted: f, error: e } = formatJSON(value);
     if (!e) { 
-      console.log('[PrettyJSON] Format applied', { chars: f.length, lines: f.split('\n').length });
+      if (import.meta.env.DEV) console.log('[PrettyJSON] Format applied', { chars: f.length, lines: f.split('\n').length });
       onChange(f); 
       setScanning(true); 
       setTimeout(() => setScanning(false), 900); 
-    } else {
-      console.warn('[PrettyJSON] Format failed:', e);
     }
   }, [value, onChange]);
 
   const handleMinify = useCallback(() => {
     const { minified, error: e } = minifyJSON(value);
     if (!e) {
-      console.log('[PrettyJSON] Minify applied', { chars: minified.length, reduction: `${(100 - (minified.length / value.length * 100)).toFixed(1)}%` });
+      if (import.meta.env.DEV) console.log('[PrettyJSON] Minify applied', { chars: minified.length });
       onChange(minified);
-    } else {
-      console.warn('[PrettyJSON] Minify failed:', e);
     }
   }, [value, onChange]);
 
   const handleCopy = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(value);
-      console.log('[PrettyJSON] JSON copied to clipboard', { chars: value.length });
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch (err) {
-      console.warn('[PrettyJSON] Clipboard copy failed:', err);
+      // Silently fail - clipboard API may not be available
     }
   }, [value]);
 
@@ -226,12 +226,11 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
     try {
       const text = await navigator.clipboard.readText();
       const { formatted: f } = formatJSON(text);
-      console.log('[PrettyJSON] JSON pasted from clipboard', { chars: text.length });
       onChange(f || text);
       setScanning(true);
       setTimeout(() => setScanning(false), 900);
     } catch (err) {
-      console.warn('[PrettyJSON] Clipboard paste failed:', err);
+      // Silently fail - clipboard API may not be available
     }
   }, [onChange]);
 
@@ -429,43 +428,60 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
             {scanning && <div className="scan-line" style={{ top: 0 }} />}
             {isEmpty && (
               <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                <div className="flex flex-col items-center gap-3">
-                  <svg width="200" height="100">
-                    <rect x="2" y="2" width="196" height="96" rx="10" fill="none"
-                      stroke={isLight ? 'rgba(59,130,246,0.3)' : 'rgba(59,130,246,0.4)'} strokeWidth="1.5" strokeDasharray="8 4"
-                      className="drop-zone-dash" />
-                  </svg>
-                  <div className="absolute flex flex-col items-center gap-2">
-                    <span className="text-[13px] font-mono tracking-wider uppercase"
-                      style={{ color: isLight ? 'rgba(59,130,246,0.5)' : 'rgba(59,130,246,0.6)' }}>Paste JSON here</span>
-                    <span className="text-[11px] font-mono"
-                      style={{ color: isLight ? '#94a3b8' : '#475569' }}>or</span>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{ background: isLight ? 'rgba(59,130,246,0.08)' : 'rgba(59,130,246,0.12)' }}>
+                      <ClipboardPaste size={20} style={{ color: isLight ? '#3b82f6' : '#60a5fa' }} />
+                    </div>
+                  </div>
+                  <span className="text-[14px] font-medium"
+                    style={{ color: isLight ? '#334155' : '#e2e8f0' }}>Paste or drop your JSON</span>
+                  <div className="flex items-center gap-3 pointer-events-auto">
                     <button
-                      onClick={() => fileInputRef.current?.click()}
-                      className={`pointer-events-auto flex items-center gap-2 px-4 py-1.5 rounded-lg text-[12px] font-mono transition-all ${
+                      onClick={handlePaste}
+                      className={`flex items-center gap-2 px-5 py-2 rounded-lg text-[13px] font-mono font-medium transition-all shadow-sm ${
                         isLight
-                          ? 'bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200'
-                          : 'bg-blue-600/15 hover:bg-blue-600/25 text-blue-400 border border-blue-500/20'
+                          ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                          : 'bg-blue-600 hover:bg-blue-500 text-white'
                       }`}
                     >
-                      <Upload size={13} />
-                      Upload .json file
+                      <ClipboardPaste size={14} />
+                      Paste & Format
+                    </button>
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-mono transition-all ${
+                        isLight
+                          ? 'bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200'
+                          : 'bg-white/[0.06] hover:bg-white/[0.1] text-slate-400 border border-white/[0.08]'
+                      }`}
+                    >
+                      <Upload size={14} />
+                      Upload File
                     </button>
                   </div>
+                  <span className="text-[11px] font-mono mt-1"
+                    style={{ color: isLight ? '#94a3b8' : '#475569' }}>or just start typing · Ctrl+V to paste</span>
                 </div>
               </div>
             )}
             <div className="flex h-full overflow-hidden" style={{ paddingBottom: error ? '100px' : (value ? '28px' : 0) }}>
               {/* Line Numbers */}
               <div className="flex flex-shrink-0 overflow-hidden" style={{ background: lineNumBg }}>
-                <div className="line-numbers pt-3 pb-3 overflow-hidden">
-                  {Array.from({ length: Math.max(lineCount, 1) }).map((_, i) => (
-                    <div key={i}>{i + 1}</div>
-                  ))}
-                </div>
+                <pre className="line-numbers pt-3 pb-3 overflow-hidden whitespace-pre">{lineNumbersText}</pre>
               </div>
-              {/* Plain text editor - shows exactly what user typed/pasted */}
+              {/* Editor with syntax-highlighted overlay */}
               <div className="relative flex-1 overflow-hidden">
+                {/* Syntax highlighted layer (read-only, behind textarea) */}
+                {value && data && (
+                  <pre
+                    className="code-editor absolute inset-0 w-full h-full p-3 overflow-auto font-mono text-[14px] leading-[23px] pointer-events-none"
+                    style={{ background: 'transparent', tabSize: 2 }}
+                    aria-hidden="true"
+                    dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify(data, null, 2)) }}
+                  />
+                )}
                 <textarea
                   ref={textareaRef}
                   value={value}
@@ -478,7 +494,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
                   className="code-editor absolute inset-0 w-full h-full p-3 resize-none overflow-auto font-mono text-[14px] leading-[23px]"
                   style={{
                     background: 'transparent',
-                    color: isLight ? '#0f172a' : '#f1f5f9',
+                    color: (value && data) ? 'transparent' : (isLight ? '#0f172a' : '#f1f5f9'),
                     caretColor: '#3B82F6',
                     tabSize: 2,
                   }}
@@ -596,6 +612,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
               filter={filter}
               pathFilter={pathFilter}
               sort={sort}
+              theme={theme}
               validationErrors={validationErrors}
               onDataChange={(newData) => {
                 onChange(JSON.stringify(newData, null, 2));
@@ -605,7 +622,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
         )}
         {view === 'table' && (
           <ErrorBoundary>
-            <TableView data={parsedData} />
+            <TableView data={parsedData} theme={theme} />
           </ErrorBoundary>
         )}
       </div>
@@ -614,16 +631,65 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
 }
 
 export default function JsonFormatter() {
-  const [leftValue, setLeftValue] = useState('');
-  const [rightValue, setRightValue] = useState('');
+  const [leftValue, setLeftValue] = useState(() => sessionStorage.getItem('prettyjson_left') || '');
+  const [rightValue, setRightValue] = useState(() => sessionStorage.getItem('prettyjson_right') || '');
   const [leftData, setLeftData] = useState(null);
   const [rightData, setRightData] = useState(null);
   const [leftValidationErrors, setLeftValidationErrors] = useState([]);
   const [rightValidationErrors, setRightValidationErrors] = useState([]);
-  const [layout, setLayout] = useState('single');
-  const [theme, setTheme] = useState('light');
+  const [layout, setLayout] = useState(() => localStorage.getItem('prettyjson_layout') || 'single');
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem('prettyjson_theme');
+    if (saved) return saved;
+    // System theme detection for first-time visitors
+    if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) return 'dark';
+    return 'light';
+  });
   const [showAd, setShowAd] = useState(true);
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
+
+  // Load JSON from URL hash on mount (share via URL)
+  useEffect(() => {
+    const hash = window.location.hash.slice(1);
+    if (hash && hash.startsWith('json=')) {
+      try {
+        const compressed = hash.slice(5);
+        const json = LZString.decompressFromEncodedURIComponent(compressed);
+        if (json) {
+          const { formatted } = formatJSON(json);
+          setLeftValue(formatted || json);
+          // Clear hash after loading
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+      } catch {}
+    }
+  }, []);
+
+  // Debounced sessionStorage writes for JSON values (avoid blocking on every keystroke)
+  const storageTimerRef = useRef(null);
+  useEffect(() => {
+    clearTimeout(storageTimerRef.current);
+    storageTimerRef.current = setTimeout(() => {
+      try { sessionStorage.setItem('prettyjson_left', leftValue); } catch {}
+    }, 300);
+    return () => clearTimeout(storageTimerRef.current);
+  }, [leftValue]);
+  const storageTimerRef2 = useRef(null);
+  useEffect(() => {
+    clearTimeout(storageTimerRef2.current);
+    storageTimerRef2.current = setTimeout(() => {
+      try { sessionStorage.setItem('prettyjson_right', rightValue); } catch {}
+    }, 300);
+    return () => clearTimeout(storageTimerRef2.current);
+  }, [rightValue]);
+  useEffect(() => {
+    localStorage.setItem('prettyjson_layout', layout);
+  }, [layout]);
+  useEffect(() => {
+    localStorage.setItem('prettyjson_theme', theme);
+  }, [theme]);
 
   const isLight = theme === 'light';
   // Improved color palette with better contrast
@@ -642,27 +708,71 @@ export default function JsonFormatter() {
     setRightData(data);
   }, [rightValue]);
 
-  // Initialize and log app state
+  // Initialize
   useEffect(() => {
-    console.log('[PrettyJSON] App initialized', { theme, layout });
+    if (import.meta.env.DEV) console.log('[PrettyJSON] App initialized', { theme, layout });
   }, []);
 
-  // Log theme changes
-  useEffect(() => {
-    console.log(`[PrettyJSON] Theme changed to: ${theme}`);
-  }, [theme]);
+  // Share JSON via URL (compressed, max ~5KB input)
+  const handleShare = useCallback(() => {
+    if (!leftValue || !leftValue.trim()) return;
+    // Limit shareable size to ~5KB
+    if (leftValue.length > 5120) {
+      alert('JSON is too large to share via URL. Maximum size is 5KB.');
+      return;
+    }
+    const compressed = LZString.compressToEncodedURIComponent(leftValue);
+    const url = `${window.location.origin}${window.location.pathname}#json=${compressed}`;
+    try {
+      navigator.clipboard.writeText(url);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    } catch {}
+  }, [leftValue]);
 
-  // Log layout changes
-  useEffect(() => {
-    console.log(`[PrettyJSON] Layout changed to: ${layout}`);
-  }, [layout]);
-
+  // Global keyboard shortcuts
   useEffect(() => {
     const handler = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'F') {
+      const mod = e.ctrlKey || e.metaKey;
+      // Ctrl+Shift+F — Format
+      if (mod && e.shiftKey && e.key === 'F') {
         e.preventDefault();
         const { formatted } = formatJSON(leftValue);
         if (formatted) setLeftValue(formatted);
+        return;
+      }
+      // Ctrl+K — Shortcuts overlay
+      if (mod && e.key === 'k') {
+        e.preventDefault();
+        setShowShortcuts(s => !s);
+        return;
+      }
+      // Ctrl+M — Minify
+      if (mod && e.key === 'm') {
+        e.preventDefault();
+        const { minified } = minifyJSON(leftValue);
+        if (minified) setLeftValue(minified);
+        return;
+      }
+      // Ctrl+D — Toggle diff
+      if (mod && e.key === 'd' && !e.shiftKey) {
+        e.preventDefault();
+        setLayout(l => l === 'diff' ? 'single' : 'diff');
+        return;
+      }
+      // Ctrl+S — Quick download JSON
+      if (mod && e.key === 's') {
+        e.preventDefault();
+        if (leftValue && leftValue.trim()) {
+          const blob = new Blob([leftValue], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'prettyjson-export.json';
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+        return;
       }
     };
     window.addEventListener('keydown', handler);
@@ -670,8 +780,8 @@ export default function JsonFormatter() {
   }, [leftValue]);
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden mono-grid"
-      style={{ background: bg0 }} data-theme={theme}>
+    <div className="flex flex-col min-h-screen" style={{ background: bg0, color: isLight ? '#334155' : '#cbd5e1' }} data-theme={theme}>
+      <div className="flex flex-col h-[100dvh] overflow-hidden mono-grid flex-shrink-0">
       <TopBar theme={theme} onThemeToggle={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />
 
       {/* Toolbar */}
@@ -695,6 +805,29 @@ export default function JsonFormatter() {
         <span className="text-[11px] font-mono hidden sm:block" style={{ color: isLight ? '#64748b' : '#64748b' }}>
           {layout === 'diff' ? 'Diff view - comparing left and right' : layout === 'split' ? 'Side-by-side comparison mode' : 'Single panel mode'}
         </span>
+        <button
+          onClick={() => setShowShortcuts(true)}
+          title="Keyboard shortcuts (Ctrl+K)"
+          className={`flex items-center gap-1.5 px-2 h-7 rounded text-[11px] font-mono transition-all ${
+            isLight ? 'text-slate-400 hover:text-slate-600 hover:bg-slate-100' : 'text-slate-600 hover:text-slate-400 hover:bg-white/[0.03]'
+          }`}
+        >
+          <Keyboard size={13} />
+          <span className="hidden sm:inline">Shortcuts</span>
+        </button>
+        <button
+          onClick={handleShare}
+          disabled={!leftValue || !leftValue.trim()}
+          title="Share JSON via URL (copies link)"
+          className={`flex items-center gap-1.5 px-2 h-7 rounded text-[11px] font-mono transition-all disabled:opacity-30 ${
+            shareCopied
+              ? 'text-emerald-500'
+              : isLight ? 'text-slate-400 hover:text-slate-600 hover:bg-slate-100' : 'text-slate-600 hover:text-slate-400 hover:bg-white/[0.03]'
+          }`}
+        >
+          {shareCopied ? <Check size={13} /> : <Share2 size={13} />}
+          <span className="hidden sm:inline">{shareCopied ? 'Link Copied!' : 'Share'}</span>
+        </button>
       </div>
 
       {/* Panels + right sidebar ad */}
@@ -807,8 +940,76 @@ export default function JsonFormatter() {
         </div>
       </div>
 
+      {/* Privacy Policy Modal inside the app container is fine but lets put it outside so it covers everything */}
+
+      </div> {/* End of app container */}
+
+      {/* SEO and Footer Section for AdSense/Search Engines */}
+      <div className="w-full border-t flex-1 font-sans" style={{ background: isLight ? '#ffffff' : '#0f172a', borderColor }}>
+        <div className="max-w-5xl mx-auto px-6 py-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="md:col-span-2 space-y-8">
+              <section>
+                <h1 className="text-3xl font-bold mb-4" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Free Online JSON Formatter & Validator</h1>
+                <p className="leading-relaxed mb-4">
+                  PrettyJSON is a powerful, secure, and free online tool designed for developers to format, validate, parse, and edit JSON data. 
+                  Whether you are debugging API responses, formatting configuration files, or comparing JSON payloads, our tool provides an intuitive interface to make your work easier.
+                </p>
+                <p className="leading-relaxed">
+                  Unlike other tools, PrettyJSON processes all your data locally in your browser. Your JSON data is never sent to our servers, ensuring complete privacy and security for your sensitive information.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-bold mb-3" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Key Features</h2>
+                <ul className="list-disc pl-5 space-y-2">
+                  <li><strong>Format & Beautify:</strong> Instantly convert minified or messy JSON into beautifully indented, readable syntax.</li>
+                  <li><strong>Validate & Auto-Repair:</strong> Detect syntax errors instantly. Our auto-repair feature can fix common mistakes like missing quotes, trailing commas, and unescaped characters.</li>
+                  <li><strong>Tree & Table Views:</strong> Visualize complex nested objects and arrays with our interactive Tree viewer, or flatten your data into a Table.</li>
+                  <li><strong>JSON Diff:</strong> Compare two JSON files side-by-side to highlight additions, deletions, and modifications.</li>
+                </ul>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-bold mb-3" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>What is JSON?</h2>
+                <p className="leading-relaxed">
+                  JSON (JavaScript Object Notation) is a lightweight data-interchange format that is easy for humans to read and write and easy for machines to parse and generate. It is widely used in APIs, configuration files, and data storage.
+                </p>
+              </section>
+            </div>
+
+            <div>
+              <div className="p-6 rounded-xl border" style={{ background: isLight ? '#f8fafc' : '#1e293b', borderColor }}>
+                <h3 className="text-lg font-bold mb-4" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Legal & Resources</h3>
+                <ul className="space-y-3">
+                  <li>
+                    <button onClick={() => setShowPrivacy(true)} className="hover:underline text-blue-500">Privacy Policy</button>
+                  </li>
+                  <li>
+                    <a href="mailto:contact@prettyjson.org" className="hover:underline text-blue-500">Contact Us</a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:underline text-slate-500">Terms of Service</a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:underline text-slate-500">About PrettyJSON</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-16 pt-8 border-t text-center text-sm" style={{ borderColor, color: isLight ? '#64748b' : '#94a3b8' }}>
+            <p>&copy; {new Date().getFullYear()} PrettyJSON. All rights reserved.</p>
+          </div>
+        </div>
+      </div>
+
       {/* Privacy Policy Modal */}
       <PrivacyPolicy open={showPrivacy} onClose={() => setShowPrivacy(false)} theme={theme} />
+
+      {/* Keyboard Shortcuts Overlay */}
+      <KeyboardShortcuts open={showShortcuts} onClose={() => setShowShortcuts(false)} theme={theme} />
     </div>
   );
 }

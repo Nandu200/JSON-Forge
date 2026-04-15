@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,29 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { exportToJSON, exportToCSV, convertToCSV } from '@/utils/schemaValidation';
+
+function CsvPreview({ jsonData, isLight }) {
+  const csvLines = useMemo(() => {
+    const csv = convertToCSV(jsonData);
+    const lines = csv.split('\n');
+    return { preview: lines.slice(0, 5).join('\n'), hasMore: lines.length > 5 };
+  }, [jsonData]);
+
+  return (
+    <div className="space-y-2">
+      <span className={`text-[10px] font-mono ${isLight ? 'text-slate-500' : 'text-slate-500'}`}>
+        CSV Preview (first 5 lines):
+      </span>
+      <div className={`p-3 rounded border overflow-x-auto ${
+        isLight ? 'bg-slate-100 border-slate-200' : 'bg-[#080910] border-white/[0.06]'
+      }`}>
+        <pre className={`text-[9px] font-mono whitespace-pre ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
+          {csvLines.preview}{csvLines.hasMore && '\n...'}
+        </pre>
+      </div>
+    </div>
+  );
+}
 
 export default function ExportDialog({
   jsonData,
@@ -214,34 +237,7 @@ export default function ExportDialog({
 
           {/* CSV Preview */}
           {canExportCSV && (
-            <div className="space-y-2">
-              <span
-                className={`text-[10px] font-mono ${
-                  isLight ? 'text-slate-500' : 'text-slate-500'
-                }`}
-              >
-                CSV Preview (first 5 lines):
-              </span>
-              <div
-                className={`p-3 rounded border overflow-x-auto ${
-                  isLight
-                    ? 'bg-slate-100 border-slate-200'
-                    : 'bg-[#080910] border-white/[0.06]'
-                }`}
-              >
-                <pre
-                  className={`text-[9px] font-mono whitespace-pre ${
-                    isLight ? 'text-slate-600' : 'text-slate-400'
-                  }`}
-                >
-                  {convertToCSV(jsonData)
-                    .split('\n')
-                    .slice(0, 5)
-                    .join('\n')}
-                  {convertToCSV(jsonData).split('\n').length > 5 && '\n...'}
-                </pre>
-              </div>
-            </div>
+            <CsvPreview jsonData={jsonData} isLight={isLight} />
           )}
         </div>
       </DialogContent>

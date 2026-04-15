@@ -33,10 +33,15 @@ function getEntries(obj, filter, sort) {
   let entries = Object.entries(obj);
   if (filter) {
     const f = filter.toLowerCase();
-    entries = entries.filter(([k, v]) =>
-      String(k).toLowerCase().includes(f) ||
-      JSON.stringify(v).toLowerCase().includes(f)
-    );
+    entries = entries.filter(([k, v]) => {
+      // Check key first (cheap)
+      if (String(k).toLowerCase().includes(f)) return true;
+      // For primitives, check value directly (avoid JSON.stringify)
+      if (v === null || v === undefined) return String(v).includes(f);
+      if (typeof v !== 'object') return String(v).toLowerCase().includes(f);
+      // Only stringify objects/arrays as a last resort
+      try { return JSON.stringify(v).toLowerCase().includes(f); } catch { return false; }
+    });
   }
   if (sort === 'asc') entries.sort((a, b) => String(a[0]).localeCompare(String(b[0])));
   else if (sort === 'desc') entries.sort((a, b) => String(b[0]).localeCompare(String(a[0])));
@@ -44,10 +49,11 @@ function getEntries(obj, filter, sort) {
   return entries;
 }
 
-export default function TreeView({ data, filter = '', pathFilter = '', sort = 'none', validationErrors = [], onDataChange }) {
+export default function TreeView({ data, filter = '', pathFilter = '', sort = 'none', theme = 'light', validationErrors = [], onDataChange }) {
   const [hoveredPath, setHoveredPath] = useState('');
   const [localData, setLocalData] = useState(data);
   const handlePathHover = useCallback((p) => setHoveredPath(p), []);
+  const isLight = theme === 'light';
 
   // Update local data when prop changes
   React.useEffect(() => {
@@ -133,7 +139,8 @@ export default function TreeView({ data, filter = '', pathFilter = '', sort = 'n
   if (filteredData === null || filteredData === undefined) {
     return (
       <div className="flex items-center justify-center h-full">
-        <span className="text-[12px] font-mono text-slate-500 tracking-widest uppercase">No valid JSON</span>
+        <span className="text-[12px] font-mono tracking-widest uppercase"
+          style={{ color: isLight ? '#94a3b8' : '#64748b' }}>No valid JSON</span>
       </div>
     );
   }
@@ -141,10 +148,12 @@ export default function TreeView({ data, filter = '', pathFilter = '', sort = 'n
   return (
     <div className="h-full flex flex-col overflow-hidden">
       {/* Path breadcrumb */}
-      <div className="flex-shrink-0 h-9 flex items-center px-4 border-b border-white/[0.04]">
+      <div className="flex-shrink-0 h-9 flex items-center px-4 border-b"
+        style={{ borderColor: isLight ? '#e2e8f0' : 'rgba(255,255,255,0.04)' }}>
         <span className="breadcrumb-path">
           {pathFilter && (
-            <span className="text-blue-400 text-[11px] font-mono mr-2">
+            <span className="text-[11px] font-mono mr-2"
+              style={{ color: isLight ? '#3b82f6' : '#60a5fa' }}>
               {pathFilter} ›
             </span>
           )}
@@ -152,10 +161,10 @@ export default function TreeView({ data, filter = '', pathFilter = '', sort = 'n
             ? hoveredPath.split(' > ').map((part, i, arr) => (
                 <span key={i}>
                   <span className={i === arr.length - 1 ? 'active' : ''}>{part}</span>
-                  {i < arr.length - 1 && <span className="mx-1 text-slate-700"> › </span>}
+                  {i < arr.length - 1 && <span className="mx-1" style={{ color: isLight ? '#cbd5e1' : '#334155' }}> › </span>}
                 </span>
               ))
-            : <span className="text-slate-500">Hover a node to see path</span>
+            : <span style={{ color: isLight ? '#94a3b8' : '#64748b' }}>Hover a node to see path</span>
           }
         </span>
       </div>
@@ -176,6 +185,7 @@ export default function TreeView({ data, filter = '', pathFilter = '', sort = 'n
                 isLast={idx === arr.length - 1}
                 onPathHover={handlePathHover}
                 filter={filter}
+                theme={theme}
                 validationError={error}
                 onValueChange={onDataChange ? handleValueChange : null}
                 parentData={filteredData}
@@ -192,6 +202,7 @@ export default function TreeView({ data, filter = '', pathFilter = '', sort = 'n
             isLast={true}
             onPathHover={handlePathHover}
             filter={filter}
+            theme={theme}
             onValueChange={onDataChange ? handleValueChange : null}
             parentData={null}
             dataKey={null}
