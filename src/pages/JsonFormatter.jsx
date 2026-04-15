@@ -315,8 +315,8 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
             title="Undo (Ctrl+Z)"
             className={`w-7 h-7 flex items-center justify-center rounded transition-all disabled:opacity-30 ${
               isLight
-                ? 'hover:bg-slate-100 text-slate-500 border border-transparent hover:border-slate-200'
-                : 'hover:bg-white/[0.06] text-slate-400 border border-transparent hover:border-white/[0.08]'
+                ? 'hover:bg-slate-100 text-slate-600 border border-transparent hover:border-slate-200'
+                : 'hover:bg-white/[0.08] text-slate-300 border border-transparent hover:border-white/[0.1]'
             }`}>
             <Undo2 size={14} />
           </button>
@@ -324,8 +324,8 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
             title="Redo (Ctrl+Shift+Z)"
             className={`w-7 h-7 flex items-center justify-center rounded transition-all disabled:opacity-30 ${
               isLight
-                ? 'hover:bg-slate-100 text-slate-500 border border-transparent hover:border-slate-200'
-                : 'hover:bg-white/[0.06] text-slate-400 border border-transparent hover:border-white/[0.08]'
+                ? 'hover:bg-slate-100 text-slate-600 border border-transparent hover:border-slate-200'
+                : 'hover:bg-white/[0.08] text-slate-300 border border-transparent hover:border-white/[0.1]'
             }`}>
             <Redo2 size={14} />
           </button>
@@ -345,7 +345,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
               className={`px-2 h-7 text-[12px] font-mono rounded transition-all disabled:opacity-30 flex items-center gap-1 ${
                 isLight 
                   ? 'bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200' 
-                  : 'bg-black/[0.05] hover:bg-black/[0.08] text-slate-400 border border-black/[0.07]'
+                  : 'bg-white/[0.06] hover:bg-white/[0.1] text-slate-300 border border-white/[0.1]'
               }`}>
               <Minimize2 size={11} /> Min
             </button>
@@ -353,7 +353,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
               className={`px-2 h-7 text-[12px] font-mono rounded transition-all hidden sm:flex items-center gap-1 ${
                 isLight 
                   ? 'bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200' 
-                  : 'bg-black/[0.05] hover:bg-black/[0.08] text-slate-400 border border-black/[0.07]'
+                  : 'bg-white/[0.06] hover:bg-white/[0.1] text-slate-300 border border-white/[0.1]'
               }`}>
               <ClipboardPaste size={11} /> Paste
             </button>
@@ -361,7 +361,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
               className={`px-2 h-7 text-[12px] font-mono rounded transition-all flex items-center gap-1 hidden sm:flex ${
                 isLight 
                   ? 'bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200' 
-                  : 'bg-black/[0.05] hover:bg-black/[0.08] text-slate-400 border border-black/[0.07]'
+                  : 'bg-white/[0.06] hover:bg-white/[0.1] text-slate-300 border border-white/[0.1]'
               }`}>
               <Upload size={11} /> Load
             </button>
@@ -376,7 +376,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
               className={`w-7 h-7 flex items-center justify-center rounded transition-all disabled:opacity-30 ${
                 isLight 
                   ? 'bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200' 
-                  : 'bg-black/[0.05] hover:bg-black/[0.08] text-slate-400 border border-black/[0.07]'
+                  : 'bg-white/[0.06] hover:bg-white/[0.1] text-slate-300 border border-white/[0.1]'
               }`}>
               {copied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
             </button>
@@ -384,7 +384,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
               className={`w-7 h-7 flex items-center justify-center rounded transition-all disabled:opacity-30 ${
                 isLight 
                   ? 'bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-500 border border-slate-200 hover:border-red-200' 
-                  : 'bg-black/[0.05] hover:bg-black/[0.08] text-slate-400 hover:text-red-400 border border-black/[0.07]'
+                  : 'bg-white/[0.06] hover:bg-white/[0.1] text-slate-300 hover:text-red-400 border border-white/[0.1]'
               }`}>
               <Trash2 size={12} />
             </button>
@@ -797,8 +797,8 @@ export default function JsonFormatter() {
               className={`flex items-center gap-1.5 px-2 sm:px-3 h-7 rounded text-[12px] font-mono transition-all ${
                 layout === l 
                   ? (isLight ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'bg-blue-600/15 text-blue-400 border border-blue-500/20')
-                  : isLight ? 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
-                  : 'text-slate-600 hover:text-slate-400 hover:bg-white/[0.03]'}`}>
+                  : isLight ? 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.06]'}`}>
               {l === 'single' && <LayoutPanelLeft size={13} />}
               {l === 'split' && <Columns2 size={13} />}
               {l === 'diff' && <GitCompare size={13} />}
@@ -813,7 +813,7 @@ export default function JsonFormatter() {
           onClick={() => setShowShortcuts(true)}
           title="Keyboard shortcuts (Ctrl+K)"
           className={`flex items-center gap-1.5 px-2 h-7 rounded text-[11px] font-mono transition-all ${
-            isLight ? 'text-slate-400 hover:text-slate-600 hover:bg-slate-100' : 'text-slate-600 hover:text-slate-400 hover:bg-white/[0.03]'
+            isLight ? 'text-slate-500 hover:text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.06]'
           }`}
         >
           <Keyboard size={13} />
@@ -826,7 +826,7 @@ export default function JsonFormatter() {
           className={`flex items-center gap-1.5 px-2 h-7 rounded text-[11px] font-mono transition-all disabled:opacity-30 ${
             shareCopied
               ? 'text-emerald-500'
-              : isLight ? 'text-slate-400 hover:text-slate-600 hover:bg-slate-100' : 'text-slate-600 hover:text-slate-400 hover:bg-white/[0.03]'
+              : isLight ? 'text-slate-500 hover:text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.06]'
           }`}
         >
           {shareCopied ? <Check size={13} /> : <Share2 size={13} />}

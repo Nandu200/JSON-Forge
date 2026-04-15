@@ -62,7 +62,7 @@ export default function FilterBar({
             ? 'bg-white border-slate-200' 
             : 'bg-white/[0.04] border-white/[0.06]'
         }`}>
-          <Search size={14} className={`flex-shrink-0 ${isLight ? 'text-slate-400' : 'text-slate-500'}`} />
+          <Search size={14} className={`flex-shrink-0 ${isLight ? 'text-slate-400' : 'text-slate-400'}`} />
           <input
             type="text"
             value={filter}
@@ -76,7 +76,7 @@ export default function FilterBar({
             }`}
           />
           {filter && (
-            <button onClick={() => onFilterChange('')} className={isLight ? 'text-slate-400 hover:text-slate-600' : 'text-slate-600 hover:text-slate-400'}>
+            <button onClick={() => onFilterChange('')} className={isLight ? 'text-slate-400 hover:text-slate-600' : 'text-slate-400 hover:text-slate-200'}>
               <X size={14} />
             </button>
           )}
@@ -92,14 +92,14 @@ export default function FilterBar({
                 className={`p-1.5 rounded transition-colors disabled:opacity-30 ${
                   isLight 
                     ? 'hover:bg-slate-200 text-slate-500 hover:text-slate-700' 
-                    : 'hover:bg-white/[0.06] text-slate-500 hover:text-slate-300'
+                    : 'hover:bg-white/[0.08] text-slate-400 hover:text-slate-200'
                 }`}
                 title="Previous match (Shift+Enter)"
               >
                 <ChevronLeft size={16} />
               </button>
               <span className={`text-[11px] font-mono min-w-[40px] text-center ${
-                isLight ? 'text-slate-500' : 'text-slate-500'
+                isLight ? 'text-slate-500' : 'text-slate-400'
               }`}>
                 {searchMatchCount > 0 ? `${currentMatchIndex + 1}/${searchMatchCount}` : '0/0'}
               </span>
@@ -109,7 +109,7 @@ export default function FilterBar({
                 className={`p-1.5 rounded transition-colors disabled:opacity-30 ${
                   isLight 
                     ? 'hover:bg-slate-200 text-slate-500 hover:text-slate-700' 
-                    : 'hover:bg-white/[0.06] text-slate-500 hover:text-slate-300'
+                    : 'hover:bg-white/[0.08] text-slate-400 hover:text-slate-200'
                 }`}
                 title="Next match (Enter)"
               >
@@ -124,7 +124,7 @@ export default function FilterBar({
                 className={`flex items-center gap-1 px-2 h-6 text-[11px] font-mono rounded transition-all ${
                   showReplace 
                     ? (isLight ? 'bg-blue-100 text-blue-600' : 'bg-blue-600/20 text-blue-400')
-                    : (isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-500 hover:text-slate-300')
+                    : (isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200')
                 }`}
               >
                 <Replace size={13} />
@@ -149,7 +149,7 @@ export default function FilterBar({
                 className={`p-1.5 rounded transition-all ${
                   sort === s.id 
                     ? (isLight ? 'bg-blue-100 text-blue-600' : 'bg-blue-600/20 text-blue-400')
-                    : (isLight ? 'text-slate-500 hover:text-slate-700 hover:bg-slate-100' : 'text-slate-600 hover:text-slate-400 hover:bg-white/[0.04]')
+                    : (isLight ? 'text-slate-500 hover:text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.06]')
                 }`}
               >
                 <s.icon size={14} />
@@ -160,7 +160,7 @@ export default function FilterBar({
 
         {/* Case Sensitive Toggle */}
         <label className={`flex items-center gap-1.5 text-[11px] font-mono cursor-pointer ml-auto ${
-          isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-500 hover:text-slate-300'
+          isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200'
         }`}>
           <input
             type="checkbox"
@@ -178,7 +178,7 @@ export default function FilterBar({
             className={`flex items-center gap-1 px-2 h-6 text-[10px] font-mono rounded transition-all ${
               showAdvanced 
                 ? (isLight ? 'bg-blue-100 text-blue-600' : 'bg-blue-600/20 text-blue-400')
-                : (isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-500 hover:text-slate-300')
+                : (isLight ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200')
             }`}
           >
             <Filter size={13} />
@@ -200,7 +200,7 @@ export default function FilterBar({
               ? 'bg-white border-slate-200' 
               : 'bg-white/[0.04] border-white/[0.06]'
           }`}>
-            <Filter size={11} className={isLight ? 'text-slate-400 flex-shrink-0' : 'text-slate-600 flex-shrink-0'} />
+            <Filter size={11} className={isLight ? 'text-slate-400 flex-shrink-0' : 'text-slate-400 flex-shrink-0'} />
             <input
               type="text"
               value={pathFilter}
@@ -213,12 +213,12 @@ export default function FilterBar({
               }`}
             />
             {pathFilter && (
-              <button onClick={() => onPathFilter?.('')} className={isLight ? 'text-slate-400 hover:text-slate-600' : 'text-slate-600 hover:text-slate-400'}>
+              <button onClick={() => onPathFilter?.('')} className={isLight ? 'text-slate-400 hover:text-slate-600' : 'text-slate-400 hover:text-slate-200'}>
                 <X size={12} />
               </button>
             )}
           </div>
-          <span className={`text-[9px] font-mono ${isLight ? 'text-slate-400' : 'text-slate-600'}`}>Filter by JSON path</span>
+          <span className={`text-[9px] font-mono ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>Filter by JSON path</span>
         </div>
       )}
 
