@@ -19,19 +19,6 @@ export default function TopBar({ theme, onThemeToggle }) {
       </div>
 
       <div className="flex items-center gap-2">
-        <a
-          href="https://github.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          title="View on GitHub"
-          className="w-9 h-9 flex items-center justify-center rounded-lg border transition-all"
-          style={{
-            background: isLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.04)',
-            borderColor: isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.07)',
-          }}
-        >
-          <Github size={15} style={{ color: isLight ? '#64748b' : '#94a3b8' }} />
-        </a>
         <button
           onClick={onThemeToggle}
           title="Toggle light/dark mode"

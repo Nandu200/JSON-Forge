@@ -14,6 +14,8 @@ import ExportDialog from '@/components/json/ExportDialog';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import GoogleAd from '@/components/GoogleAd';
 import PrivacyPolicy from '@/components/PrivacyPolicy';
+import TermsOfService from '@/components/TermsOfService';
+import AboutUs from '@/components/AboutUs';
 import KeyboardShortcuts from '@/components/json/KeyboardShortcuts';
 import { LayoutPanelLeft, Columns2, Copy, Check, Trash2, Minimize2, AlertCircle, CheckCircle2, Wrench, Eye, Upload, Undo2, Redo2, X, ClipboardPaste, Keyboard, Share2, Link2 } from 'lucide-react';
 
@@ -647,6 +649,8 @@ export default function JsonFormatter() {
   });
   const [showAd, setShowAd] = useState(true);
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
 
@@ -986,13 +990,10 @@ export default function JsonFormatter() {
                     <button onClick={() => setShowPrivacy(true)} className="hover:underline text-blue-500">Privacy Policy</button>
                   </li>
                   <li>
-                    <a href="mailto:contact@prettyjson.org" className="hover:underline text-blue-500">Contact Us</a>
+                    <button onClick={() => setShowTerms(true)} className="hover:underline text-blue-500">Terms of Service</button>
                   </li>
                   <li>
-                    <a href="#" className="hover:underline text-slate-500">Terms of Service</a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:underline text-slate-500">About PrettyJSON</a>
+                    <button onClick={() => setShowAbout(true)} className="hover:underline text-blue-500">About PrettyJSON</button>
                   </li>
                 </ul>
               </div>
@@ -1005,8 +1006,10 @@ export default function JsonFormatter() {
         </div>
       </div>
 
-      {/* Privacy Policy Modal */}
+      {/* Modals */}
       <PrivacyPolicy open={showPrivacy} onClose={() => setShowPrivacy(false)} theme={theme} />
+      <TermsOfService open={showTerms} onClose={() => setShowTerms(false)} theme={theme} />
+      <AboutUs open={showAbout} onClose={() => setShowAbout(false)} theme={theme} />
 
       {/* Keyboard Shortcuts Overlay */}
       <KeyboardShortcuts open={showShortcuts} onClose={() => setShowShortcuts(false)} theme={theme} />
