@@ -32,6 +32,9 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
   const [pathFilter, setPathFilter] = useState('');
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
+  const [treeMatchCount, setTreeMatchCount] = useState(0);
+  const [treeMatchIndex, setTreeMatchIndex] = useState(0);
+  const treeMatchNavRef = useRef({ next: () => {}, prev: () => {} });
 
   // Undo/redo history
   const historyRef = useRef([value]);
@@ -172,6 +175,25 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
 
   const isLight = theme === 'light';
 
+  // Tree view match info callback
+  const handleTreeMatchInfo = useCallback((info) => {
+    setTreeMatchCount(info.count);
+    setTreeMatchIndex(info.currentIndex);
+    treeMatchNavRef.current = { next: info.next, prev: info.prev };
+  }, []);
+
+  // Effective search match info depends on active view
+  const effectiveMatchCount = view === 'tree' ? treeMatchCount : searchMatches.length;
+  const effectiveMatchIndex = view === 'tree' ? treeMatchIndex : currentMatchIndex;
+  const effectiveSearchNext = useCallback(() => {
+    if (view === 'tree') treeMatchNavRef.current.next();
+    else handleSearchNext();
+  }, [view, handleSearchNext]);
+  const effectiveSearchPrev = useCallback(() => {
+    if (view === 'tree') treeMatchNavRef.current.prev();
+    else handleSearchPrev();
+  }, [view, handleSearchPrev]);
+
   // Use parsedData from parent — avoids redundant parseJSONSafe call
   const data = parsedData;
   const error = (!value || !value.trim()) ? null : (parsedData === null ? parseJSONSafe(value).error : null);
@@ -274,6 +296,12 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
       handleRedo();
       return;
     }
+    // When search is active, Enter/Shift+Enter navigates matches instead of editing
+    if (e.key === 'Enter' && filter && searchMatches.length > 0) {
+      e.preventDefault();
+      if (e.shiftKey) handleSearchPrev(); else handleSearchNext();
+      return;
+    }
     if (e.key === 'Tab') {
       e.preventDefault();
       const start = e.target.selectionStart;
@@ -286,7 +314,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
         }
       });
     }
-  }, [value, onChange, handleUndo, handleRedo]);
+  }, [value, onChange, handleUndo, handleRedo, filter, searchMatches, handleSearchNext, handleSearchPrev]);
 
   // Theme-aware colors with improved contrast
   const statColor = isLight ? '#475569' : '#94a3b8';
@@ -409,12 +437,12 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
         onFilterChange={setFilter}
         sort={sort} 
         onSortChange={setSort}
-        onSearchNext={handleSearchNext}
-        onSearchPrev={handleSearchPrev}
+        onSearchNext={effectiveSearchNext}
+        onSearchPrev={effectiveSearchPrev}
         onReplace={handleReplace}
         onReplaceAll={handleReplaceAll}
-        searchMatchCount={searchMatches.length}
-        currentMatchIndex={currentMatchIndex}
+        searchMatchCount={effectiveMatchCount}
+        currentMatchIndex={effectiveMatchIndex}
         caseSensitive={caseSensitive}
         onCaseSensitiveChange={setCaseSensitive}
         view={view}
@@ -619,6 +647,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
               onDataChange={(newData) => {
                 onChange(JSON.stringify(newData, null, 2));
               }}
+              onMatchInfo={handleTreeMatchInfo}
             />
           </ErrorBoundary>
         )}

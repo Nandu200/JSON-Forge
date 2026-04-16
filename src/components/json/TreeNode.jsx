@@ -152,16 +152,37 @@ function TreeNode({
   validationError = null,
   onValueChange = null,
   parentData = null,
-  dataKey = null
+  dataKey = null,
+  matchPathSet,
+  forceExpandedPaths,
+  currentMatchPath,
+  treePath = 'root'
 }) {
   const isLight = theme === 'light';
   const type = getType(value);
   const isExpandable = type === 'object' || type === 'array';
+  const isMatch = matchPathSet && matchPathSet.has(treePath);
+  const isCurrentMatch = currentMatchPath === treePath;
+  const shouldForceExpand = forceExpandedPaths && forceExpandedPaths.has(treePath);
   const [collapsed, setCollapsed] = useState(depth > 3);
   const [copied, setCopied] = useState(false);
   const [showError, setShowError] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+
+  // Auto-expand when a descendant matches the search
+  useEffect(() => {
+    if (shouldForceExpand && collapsed) {
+      setCollapsed(false);
+    }
+  }, [shouldForceExpand]);
+
+  // Auto-collapse back when filter is cleared
+  useEffect(() => {
+    if (!filter && depth > 3) {
+      setCollapsed(true);
+    }
+  }, [filter]);
 
   const count = isExpandable ? countItems(value) : 0;
   const indent = depth * 20;
@@ -204,13 +225,21 @@ function TreeNode({
 
       <div 
         className="flex items-center min-h-[28px] px-2 rounded-md transition-colors cursor-default select-none"
+        data-current-match={isCurrentMatch ? 'true' : undefined}
         style={{
           paddingLeft: indent + 8,
-          background: validationError
-            ? (isLight ? 'rgba(239,68,68,0.04)' : 'rgba(239,68,68,0.06)')
-            : isHovered
-              ? (isLight ? 'rgba(59,130,246,0.04)' : 'rgba(255,255,255,0.03)')
-              : 'transparent',
+          background: isCurrentMatch
+            ? (isLight ? 'rgba(250,204,21,0.25)' : 'rgba(250,204,21,0.18)')
+            : isMatch
+              ? (isLight ? 'rgba(250,204,21,0.10)' : 'rgba(250,204,21,0.08)')
+              : validationError
+                ? (isLight ? 'rgba(239,68,68,0.04)' : 'rgba(239,68,68,0.06)')
+                : isHovered
+                  ? (isLight ? 'rgba(59,130,246,0.04)' : 'rgba(255,255,255,0.03)')
+                  : 'transparent',
+          outline: isCurrentMatch ? `2px solid ${isLight ? 'rgba(250,204,21,0.5)' : 'rgba(250,204,21,0.4)'}` : 'none',
+          outlineOffset: '-2px',
+          borderRadius: '6px',
         }}
         onMouseEnter={() => {
           setIsHovered(true);
@@ -352,6 +381,10 @@ function TreeNode({
               onValueChange={onValueChange}
               parentData={value}
               dataKey={k}
+              matchPathSet={matchPathSet}
+              forceExpandedPaths={forceExpandedPaths}
+              currentMatchPath={currentMatchPath}
+              treePath={`${treePath} > ${k}`}
             />
           ))}
           <div className="flex items-center min-h-[22px] px-2 font-mono"
