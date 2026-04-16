@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Search, X, ChevronLeft, ChevronRight, Replace, Filter, ArrowDownAZ, ArrowUpAZ, ArrowUpDown } from 'lucide-react';
+import { getQueryPlaceholder, getQueryLabel } from '@/utils/jsonQuery';
 
 export default function FilterBar({ 
   filter, 
@@ -17,6 +18,8 @@ export default function FilterBar({
   view = 'raw',
   onPathFilter,
   pathFilter = '',
+  queryMode = 'path',
+  onQueryModeChange,
   theme = 'dark'
 }) {
   const isLight = theme === 'light';
@@ -26,6 +29,7 @@ export default function FilterBar({
 
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Enter') {
+      e.preventDefault();
       e.shiftKey ? onSearchPrev?.() : onSearchNext?.();
     }
   }, [onSearchNext, onSearchPrev]);
@@ -192,9 +196,23 @@ export default function FilterBar({
         <div className={`flex items-center gap-2 px-3 py-1.5 border-t ${
           isLight ? 'border-slate-200' : 'border-white/[0.04]'
         }`}>
-          <span className={`text-[10px] font-mono flex-shrink-0 ${
-            isLight ? 'text-slate-500' : 'text-slate-500'
-          }`}>Path:</span>
+          {/* Query Mode Selector */}
+          <div className="flex items-center gap-0.5 flex-shrink-0">
+            {['path', 'jsonpath', 'jmespath'].map(mode => (
+              <button
+                key={mode}
+                onClick={() => onQueryModeChange?.(mode)}
+                className={`px-2 h-6 text-[10px] font-mono rounded transition-all ${
+                  queryMode === mode
+                    ? (isLight ? 'bg-blue-100 text-blue-600 border border-blue-200' : 'bg-blue-600/20 text-blue-400 border border-blue-500/30')
+                    : (isLight ? 'text-slate-500 hover:text-slate-700 hover:bg-slate-100' : 'text-slate-500 hover:text-slate-300 hover:bg-white/[0.04]')
+                }`}
+              >
+                {getQueryLabel(mode)}
+              </button>
+            ))}
+          </div>
+
           <div className={`flex items-center gap-1.5 border rounded px-2 h-7 flex-1 max-w-[350px] ${
             isLight 
               ? 'bg-white border-slate-200' 
@@ -205,7 +223,7 @@ export default function FilterBar({
               type="text"
               value={pathFilter}
               onChange={e => onPathFilter?.(e.target.value)}
-              placeholder="e.g. user.settings or data[0].name"
+              placeholder={getQueryPlaceholder(queryMode)}
               className={`bg-transparent text-[11px] font-mono outline-none w-full ${
                 isLight 
                   ? 'text-slate-700 placeholder-slate-400' 
@@ -218,7 +236,9 @@ export default function FilterBar({
               </button>
             )}
           </div>
-          <span className={`text-[9px] font-mono ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>Filter by JSON path</span>
+          <span className={`text-[9px] font-mono ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>
+            {getQueryLabel(queryMode)} query
+          </span>
         </div>
       )}
 

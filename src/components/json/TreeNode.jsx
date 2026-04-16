@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { ChevronRight, ChevronDown, Copy, Check, AlertCircle, Edit2 } from 'lucide-react';
 import { getType, countItems } from '@/utils/jsonUtils';
+import Highlighter from 'react-highlight-words';
 
 const TYPE_COLORS_DARK = {
   string: '#10B981',
@@ -23,16 +24,18 @@ const TYPE_COLORS_LIGHT = {
 function HighlightText({ text, filter, isLight }) {
   const str = String(text);
   if (!filter) return <>{str}</>;
-  const idx = str.toLowerCase().indexOf(filter.toLowerCase());
-  if (idx === -1) return <>{str}</>;
   return (
-    <>
-      {str.slice(0, idx)}
-      <mark style={{ background: isLight ? 'rgba(250,204,21,0.3)' : 'rgba(250,204,21,0.25)', color: isLight ? '#92400e' : '#fde68a', borderRadius: '2px', padding: '0 2px' }}>
-        {str.slice(idx, idx + filter.length)}
-      </mark>
-      {str.slice(idx + filter.length)}
-    </>
+    <Highlighter
+      searchWords={[filter]}
+      autoEscape={true}
+      textToHighlight={str}
+      highlightStyle={{
+        background: isLight ? 'rgba(250,204,21,0.3)' : 'rgba(250,204,21,0.25)',
+        color: isLight ? '#92400e' : '#fde68a',
+        borderRadius: '2px',
+        padding: '0 2px',
+      }}
+    />
   );
 }
 

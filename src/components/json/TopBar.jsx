@@ -1,5 +1,5 @@
 import React from 'react';
-import { Braces, Sun, Moon, Github } from 'lucide-react';
+import { Braces, Sun, Moon } from 'lucide-react';
 
 export default function TopBar({ theme, onThemeToggle }) {
   const isLight = theme === 'light';

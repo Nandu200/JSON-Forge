@@ -1,7 +1,7 @@
 /**
  * Parse JSON safely, returning {data, error}
  */
-export function parseJSON(str) {
+function parseJSON(str) {
   try {
     const data = JSON.parse(str);
     return { data, error: null };
@@ -46,60 +46,6 @@ export function countItems(value) {
 }
 
 /**
- * Deep diff two JSON objects
- * Returns an array of differences
- */
-export function diffJSON(a, b, path = '') {
-  const diffs = [];
-
-  if (typeof a !== typeof b || (a === null) !== (b === null)) {
-    diffs.push({ path, type: 'modified', left: a, right: b });
-    return diffs;
-  }
-
-  if (a === null || typeof a !== 'object') {
-    if (a !== b) diffs.push({ path, type: 'modified', left: a, right: b });
-    return diffs;
-  }
-
-  if (Array.isArray(a) !== Array.isArray(b)) {
-    diffs.push({ path, type: 'modified', left: a, right: b });
-    return diffs;
-  }
-
-  const allKeys = new Set([...Object.keys(a), ...Object.keys(b)]);
-  for (const key of allKeys) {
-    const childPath = path ? `${path}.${key}` : key;
-    if (!(key in a)) {
-      diffs.push({ path: childPath, type: 'added', left: undefined, right: b[key] });
-    } else if (!(key in b)) {
-      diffs.push({ path: childPath, type: 'removed', left: a[key], right: undefined });
-    } else {
-      diffs.push(...diffJSON(a[key], b[key], childPath));
-    }
-  }
-
-  return diffs;
-}
-
-/**
- * Build a flat path map for a JSON object
- */
-export function buildPathMap(obj, prefix = 'root') {
-  const map = {};
-  function traverse(value, path) {
-    map[path] = value;
-    if (value && typeof value === 'object') {
-      Object.entries(value).forEach(([key, val]) => {
-        traverse(val, `${path} > ${key}`);
-      });
-    }
-  }
-  traverse(obj, prefix);
-  return map;
-}
-
-/**
  * Flatten object arrays for table view
  */
 export function flattenForTable(data) {
@@ -123,25 +69,6 @@ export function flattenForTable(data) {
   }
 
   return { headers: [], rows: [] };
-}
-
-/**
- * Get max depth of a JSON object
- */
-export function getDepth(value, current = 0) {
-  if (value === null || typeof value !== 'object') return current;
-  const keys = Object.keys(value);
-  if (!keys.length) return current;
-  return Math.max(...keys.map(k => getDepth(value[k], current + 1)));
-}
-
-/**
- * Count all keys/values recursively
- */
-export function countAllKeys(value) {
-  if (value === null || typeof value !== 'object') return 0;
-  const keys = Object.keys(value);
-  return keys.length + keys.reduce((acc, k) => acc + countAllKeys(value[k]), 0);
 }
 
 /**

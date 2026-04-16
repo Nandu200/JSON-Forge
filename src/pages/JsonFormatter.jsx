@@ -17,7 +17,7 @@ import PrivacyPolicy from '@/components/PrivacyPolicy';
 import TermsOfService from '@/components/TermsOfService';
 import AboutUs from '@/components/AboutUs';
 import KeyboardShortcuts from '@/components/json/KeyboardShortcuts';
-import { LayoutPanelLeft, Columns2, Copy, Check, Trash2, Minimize2, AlertCircle, CheckCircle2, Wrench, Eye, Upload, Undo2, Redo2, X, ClipboardPaste, Keyboard, Share2, Link2 } from 'lucide-react';
+import { LayoutPanelLeft, Columns2, Copy, Check, Trash2, Minimize2, AlertCircle, CheckCircle2, Wrench, Eye, Upload, Undo2, Redo2, X, ClipboardPaste, Keyboard, Share2 } from 'lucide-react';
 
 function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedData, theme, validationErrors = [], onValidationErrorsChange }) {
   const [filter, setFilter] = useState('');
@@ -30,6 +30,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const [caseSensitive, setCaseSensitive] = useState(false);
   const [pathFilter, setPathFilter] = useState('');
+  const [queryMode, setQueryMode] = useState('path');
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
   const [treeMatchCount, setTreeMatchCount] = useState(0);
@@ -124,9 +125,13 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
     const nextIndex = (currentMatchIndex + 1) % searchMatches.length;
     setCurrentMatchIndex(nextIndex);
     const pos = searchMatches[nextIndex];
-    textareaRef.current.focus();
-    textareaRef.current.setSelectionRange(pos, pos + filter.length);
-    updateCursorPos();
+    // Defer focus to avoid browser inserting newline from Enter keydown in FilterBar
+    requestAnimationFrame(() => {
+      if (!textareaRef.current) return;
+      textareaRef.current.focus();
+      textareaRef.current.setSelectionRange(pos, pos + filter.length);
+      updateCursorPos();
+    });
   }, [searchMatches, currentMatchIndex, filter, updateCursorPos]);
 
   const handleSearchPrev = useCallback(() => {
@@ -134,9 +139,13 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
     const prevIndex = currentMatchIndex === 0 ? searchMatches.length - 1 : currentMatchIndex - 1;
     setCurrentMatchIndex(prevIndex);
     const pos = searchMatches[prevIndex];
-    textareaRef.current.focus();
-    textareaRef.current.setSelectionRange(pos, pos + filter.length);
-    updateCursorPos();
+    // Defer focus to avoid browser inserting newline from Enter keydown in FilterBar
+    requestAnimationFrame(() => {
+      if (!textareaRef.current) return;
+      textareaRef.current.focus();
+      textareaRef.current.setSelectionRange(pos, pos + filter.length);
+      updateCursorPos();
+    });
   }, [searchMatches, currentMatchIndex, filter, updateCursorPos]);
 
   // Handle replace single occurrence
@@ -448,6 +457,8 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
         view={view}
         pathFilter={pathFilter}
         onPathFilter={setPathFilter}
+        queryMode={queryMode}
+        onQueryModeChange={setQueryMode}
         theme={theme}
       />
 
@@ -641,6 +652,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
               data={parsedData} 
               filter={filter}
               pathFilter={pathFilter}
+              queryMode={queryMode}
               sort={sort}
               theme={theme}
               validationErrors={validationErrors}

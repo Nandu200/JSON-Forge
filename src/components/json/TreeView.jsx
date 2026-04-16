@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { getType } from '@/utils/jsonUtils';
+import { executeQuery } from '@/utils/jsonQuery';
 import TreeNode from './TreeNode';
 
 /**
@@ -82,7 +83,7 @@ function getExpandedPaths(matchPaths) {
   return expanded;
 }
 
-export default function TreeView({ data, filter = '', pathFilter = '', sort = 'none', theme = 'light', validationErrors = [], onDataChange, onMatchInfo }) {
+export default function TreeView({ data, filter = '', pathFilter = '', queryMode = 'path', sort = 'none', theme = 'light', validationErrors = [], onDataChange, onMatchInfo }) {
   const [hoveredPath, setHoveredPath] = useState('');
   const [localData, setLocalData] = useState(data);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
@@ -159,9 +160,14 @@ export default function TreeView({ data, filter = '', pathFilter = '', sort = 'n
   // Apply path filter to get subtree
   const filteredData = useMemo(() => {
     if (!pathFilter || !displayData) return displayData;
-    const result = getByPath(displayData, pathFilter);
+    if (queryMode === 'path') {
+      const result = getByPath(displayData, pathFilter);
+      return result !== undefined ? result : displayData;
+    }
+    // JSONPath or JMESPath
+    const { result, error } = executeQuery(displayData, pathFilter, queryMode);
     return result !== undefined ? result : displayData;
-  }, [displayData, pathFilter]);
+  }, [displayData, pathFilter, queryMode]);
 
   const rootEntries = useMemo(() => {
     if (!filteredData || typeof filteredData !== 'object') return null;

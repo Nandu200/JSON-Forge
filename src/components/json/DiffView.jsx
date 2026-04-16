@@ -1,82 +1,53 @@
 import React, { useMemo, useRef, useCallback, useEffect, useState } from 'react';
-import { diffJSON } from '@/utils/jsonUtils';
 import { GitCompare, FileText, GitBranch } from 'lucide-react';
+import { diffArrays } from 'diff';
 
 /**
- * Compute line-level diff using LCS-based approach for accurate line matching
+ * Compute line-level diff using Myers algorithm (via jsdiff).
+ * O(nd) time/space — handles large files without OOM.
  */
 function computeLineDiff(leftLines, rightLines) {
-  const m = leftLines.length;
-  const n = rightLines.length;
+  const changes = diffArrays(leftLines, rightLines);
+  const result = [];
+  let leftNum = 1;
+  let rightNum = 1;
 
-  // For very large files, fall back to simple comparison
-  if (m * n > 1000000) {
-    return simpleLineDiff(leftLines, rightLines);
-  }
+  for (let ci = 0; ci < changes.length; ci++) {
+    const change = changes[ci];
 
-  // LCS DP table
-  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
-  for (let i = 1; i <= m; i++) {
-    for (let j = 1; j <= n; j++) {
-      if (leftLines[i - 1] === rightLines[j - 1]) {
-        dp[i][j] = dp[i - 1][j - 1] + 1;
+    if (!change.added && !change.removed) {
+      for (const line of change.value) {
+        result.push({ left: line, right: line, type: 'equal', leftNum: leftNum++, rightNum: rightNum++ });
+      }
+    } else if (change.removed) {
+      const next = changes[ci + 1];
+      if (next && next.added) {
+        // Pair removed + added as modifications
+        const maxLen = Math.max(change.value.length, next.value.length);
+        for (let i = 0; i < maxLen; i++) {
+          const left = i < change.value.length ? change.value[i] : null;
+          const right = i < next.value.length ? next.value[i] : null;
+          if (left !== null && right !== null) {
+            result.push({ left, right, type: 'modified', leftNum: leftNum++, rightNum: rightNum++ });
+          } else if (left !== null) {
+            result.push({ left, right: null, type: 'removed', leftNum: leftNum++, rightNum: null });
+          } else {
+            result.push({ left: null, right, type: 'added', leftNum: null, rightNum: rightNum++ });
+          }
+        }
+        ci++; // Skip the consumed 'added' block
       } else {
-        dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+        for (const line of change.value) {
+          result.push({ left: line, right: null, type: 'removed', leftNum: leftNum++, rightNum: null });
+        }
+      }
+    } else if (change.added) {
+      for (const line of change.value) {
+        result.push({ left: null, right: line, type: 'added', leftNum: null, rightNum: rightNum++ });
       }
     }
   }
 
-  // Backtrack to build aligned lines
-  const alignedLeft = [];
-  const alignedRight = [];
-  const lineTypes = [];
-  let i = m, j = n;
-
-  const result = [];
-  while (i > 0 || j > 0) {
-    if (i > 0 && j > 0 && leftLines[i - 1] === rightLines[j - 1]) {
-      result.push({ left: leftLines[i - 1], right: rightLines[j - 1], type: 'equal', leftNum: i, rightNum: j });
-      i--; j--;
-    } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
-      result.push({ left: null, right: rightLines[j - 1], type: 'added', leftNum: null, rightNum: j });
-      j--;
-    } else {
-      result.push({ left: leftLines[i - 1], right: null, type: 'removed', leftNum: i, rightNum: null });
-      i--;
-    }
-  }
-
-  result.reverse();
-
-  // Detect modified lines (adjacent remove+add with similar content)
-  for (let k = 0; k < result.length - 1; k++) {
-    if (result[k].type === 'removed' && result[k + 1].type === 'added') {
-      result[k].type = 'modified';
-      result[k].right = result[k + 1].right;
-      result[k].rightNum = result[k + 1].rightNum;
-      result.splice(k + 1, 1);
-    }
-  }
-
-  return result;
-}
-
-function simpleLineDiff(leftLines, rightLines) {
-  const maxLen = Math.max(leftLines.length, rightLines.length);
-  const result = [];
-  for (let i = 0; i < maxLen; i++) {
-    const left = i < leftLines.length ? leftLines[i] : null;
-    const right = i < rightLines.length ? rightLines[i] : null;
-    if (left === right) {
-      result.push({ left, right, type: 'equal', leftNum: i + 1, rightNum: i + 1 });
-    } else if (left === null) {
-      result.push({ left: null, right, type: 'added', leftNum: null, rightNum: i + 1 });
-    } else if (right === null) {
-      result.push({ left, right: null, type: 'removed', leftNum: i + 1, rightNum: null });
-    } else {
-      result.push({ left, right, type: 'modified', leftNum: i + 1, rightNum: i + 1 });
-    }
-  }
   return result;
 }
 
