@@ -136,6 +136,26 @@
 .json-bracket { color: var(--syntax-bracket); }
 .json-punctuation { color: #4B5563; }
 
+/* Search Highlights */
+.search-match {
+  background: rgba(250, 204, 21, 0.4);
+  border-radius: 2px;
+  color: inherit;
+}
+.search-current {
+  background: rgba(250, 204, 21, 0.8);
+  border-radius: 2px;
+  outline: 2px solid #f59e0b;
+  color: inherit;
+}
+[data-theme="light"] .search-match {
+  background: rgba(250, 204, 21, 0.35);
+}
+[data-theme="light"] .search-current {
+  background: rgba(250, 204, 21, 0.7);
+  outline-color: #d97706;
+}
+
 /* Code Editor */
 .code-editor {
   font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;

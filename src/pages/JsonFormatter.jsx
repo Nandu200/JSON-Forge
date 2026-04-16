@@ -32,6 +32,8 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
   const [pathFilter, setPathFilter] = useState('');
   const [queryMode, setQueryMode] = useState('path');
   const textareaRef = useRef(null);
+  const overlayRef = useRef(null);
+  const lineNumRef = useRef(null);
   const fileInputRef = useRef(null);
   const [treeMatchCount, setTreeMatchCount] = useState(0);
   const [treeMatchIndex, setTreeMatchIndex] = useState(0);
@@ -125,28 +127,37 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
     const nextIndex = (currentMatchIndex + 1) % searchMatches.length;
     setCurrentMatchIndex(nextIndex);
     const pos = searchMatches[nextIndex];
-    // Defer focus to avoid browser inserting newline from Enter keydown in FilterBar
     requestAnimationFrame(() => {
       if (!textareaRef.current) return;
-      textareaRef.current.focus();
+      textareaRef.current.focus({ preventScroll: true });
       textareaRef.current.setSelectionRange(pos, pos + filter.length);
+      // Scroll textarea to show the match without moving the page
+      const lines = value.substring(0, pos).split('\n');
+      const lineHeight = 23;
+      const targetScroll = (lines.length - 1) * lineHeight - textareaRef.current.clientHeight / 2;
+      textareaRef.current.scrollTop = Math.max(0, targetScroll);
+      handleScroll();
       updateCursorPos();
     });
-  }, [searchMatches, currentMatchIndex, filter, updateCursorPos]);
+  }, [searchMatches, currentMatchIndex, filter, value, updateCursorPos, handleScroll]);
 
   const handleSearchPrev = useCallback(() => {
     if (searchMatches.length === 0 || !textareaRef.current) return;
     const prevIndex = currentMatchIndex === 0 ? searchMatches.length - 1 : currentMatchIndex - 1;
     setCurrentMatchIndex(prevIndex);
     const pos = searchMatches[prevIndex];
-    // Defer focus to avoid browser inserting newline from Enter keydown in FilterBar
     requestAnimationFrame(() => {
       if (!textareaRef.current) return;
-      textareaRef.current.focus();
+      textareaRef.current.focus({ preventScroll: true });
       textareaRef.current.setSelectionRange(pos, pos + filter.length);
+      const lines = value.substring(0, pos).split('\n');
+      const lineHeight = 23;
+      const targetScroll = (lines.length - 1) * lineHeight - textareaRef.current.clientHeight / 2;
+      textareaRef.current.scrollTop = Math.max(0, targetScroll);
+      handleScroll();
       updateCursorPos();
     });
-  }, [searchMatches, currentMatchIndex, filter, updateCursorPos]);
+  }, [searchMatches, currentMatchIndex, filter, value, updateCursorPos, handleScroll]);
 
   // Handle replace single occurrence
   const handleReplace = useCallback((searchText, replaceText) => {
@@ -214,6 +225,35 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
     return Array.from({ length: Math.max(lineCount, 1) }, (_, i) => i + 1).join('\n');
   }, [lineCount]);
 
+  // Build overlay HTML with search highlights baked in
+  const overlayHTML = useMemo(() => {
+    if (!value || !data) return '';
+    const highlighted = syntaxHighlight(value);
+    if (!filter || searchMatches.length === 0) return highlighted;
+
+    // Insert highlight markers into the raw text, then syntax-highlight, then replace with <mark> tags
+    const OPEN = '\x00MARK_OPEN\x00';
+    const OPEN_CURRENT = '\x00MARK_CURRENT\x00';
+    const CLOSE = '\x00MARK_CLOSE\x00';
+
+    let marked = value;
+    const sortedMatches = [...searchMatches].sort((a, b) => b - a);
+    for (const pos of sortedMatches) {
+      const isCurrent = pos === searchMatches[currentMatchIndex];
+      const before = marked.substring(0, pos);
+      const match = marked.substring(pos, pos + filter.length);
+      const after = marked.substring(pos + filter.length);
+      marked = before + (isCurrent ? OPEN_CURRENT : OPEN) + match + CLOSE + after;
+    }
+
+    let html = syntaxHighlight(marked);
+    html = html.replace(/\x00MARK_CURRENT\x00/g, '<mark class="search-current">');
+    html = html.replace(/\x00MARK_OPEN\x00/g, '<mark class="search-match">');
+    html = html.replace(/\x00MARK_CLOSE\x00/g, '</mark>');
+
+    return html;
+  }, [value, data, filter, searchMatches, currentMatchIndex]);
+
   // Stats footer - use safe functions for large data
   const stats = useMemo(() => {
     if (!parsedData) return null;
@@ -266,6 +306,18 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
       // Silently fail - clipboard API may not be available
     }
   }, [onChange]);
+
+  const handleScroll = useCallback(() => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    if (overlayRef.current) {
+      overlayRef.current.scrollTop = ta.scrollTop;
+      overlayRef.current.scrollLeft = ta.scrollLeft;
+    }
+    if (lineNumRef.current) {
+      lineNumRef.current.scrollTop = ta.scrollTop;
+    }
+  }, []);
 
   const handleFileUpload = useCallback((e) => {
     const file = e.target.files?.[0];
@@ -509,18 +561,19 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
             )}
             <div className="flex h-full overflow-hidden" style={{ paddingBottom: error ? '100px' : (value ? '28px' : 0) }}>
               {/* Line Numbers */}
-              <div className="flex flex-shrink-0 overflow-hidden" style={{ background: lineNumBg }}>
-                <pre className="line-numbers pt-3 pb-3 overflow-hidden whitespace-pre">{lineNumbersText}</pre>
+              <div ref={lineNumRef} className="flex flex-shrink-0 overflow-hidden" style={{ background: lineNumBg }}>
+                <pre className="line-numbers pt-3 pb-3 whitespace-pre">{lineNumbersText}</pre>
               </div>
               {/* Editor with syntax-highlighted overlay */}
               <div className="relative flex-1 overflow-hidden">
                 {/* Syntax highlighted layer (read-only, behind textarea) */}
                 {value && data && (
                   <pre
-                    className="code-editor absolute inset-0 w-full h-full p-3 overflow-auto font-mono text-[14px] leading-[23px] pointer-events-none"
+                    ref={overlayRef}
+                    className="code-editor absolute inset-0 w-full h-full p-3 overflow-hidden font-mono text-[14px] leading-[23px] pointer-events-none"
                     style={{ background: 'transparent', tabSize: 2 }}
                     aria-hidden="true"
-                    dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify(data, null, 2)) }}
+                    dangerouslySetInnerHTML={{ __html: overlayHTML }}
                   />
                 )}
                 <textarea
@@ -528,6 +581,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
                   value={value}
                   onChange={e => onChange(e.target.value)}
                   onKeyDown={handleKeyDown}
+                  onScroll={handleScroll}
                   onClick={updateCursorPos}
                   onKeyUp={updateCursorPos}
                   spellCheck={false}
