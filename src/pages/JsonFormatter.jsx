@@ -122,6 +122,18 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
     setCurrentMatchIndex(0);
   }, [filter, value, caseSensitive]);
 
+  const handleScroll = useCallback(() => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    if (overlayRef.current) {
+      overlayRef.current.scrollTop = ta.scrollTop;
+      overlayRef.current.scrollLeft = ta.scrollLeft;
+    }
+    if (lineNumRef.current) {
+      lineNumRef.current.scrollTop = ta.scrollTop;
+    }
+  }, []);
+
   const handleSearchNext = useCallback(() => {
     if (searchMatches.length === 0 || !textareaRef.current) return;
     const nextIndex = (currentMatchIndex + 1) % searchMatches.length;
@@ -306,18 +318,6 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
       // Silently fail - clipboard API may not be available
     }
   }, [onChange]);
-
-  const handleScroll = useCallback(() => {
-    const ta = textareaRef.current;
-    if (!ta) return;
-    if (overlayRef.current) {
-      overlayRef.current.scrollTop = ta.scrollTop;
-      overlayRef.current.scrollLeft = ta.scrollLeft;
-    }
-    if (lineNumRef.current) {
-      lineNumRef.current.scrollTop = ta.scrollTop;
-    }
-  }, []);
 
   const handleFileUpload = useCallback((e) => {
     const file = e.target.files?.[0];
