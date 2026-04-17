@@ -16,7 +16,9 @@ import GoogleAd from '@/components/GoogleAd';
 import PrivacyPolicy from '@/components/PrivacyPolicy';
 import TermsOfService from '@/components/TermsOfService';
 import AboutUs from '@/components/AboutUs';
+import ContactUs from '@/components/ContactUs';
 import KeyboardShortcuts from '@/components/json/KeyboardShortcuts';
+import HelpDocs from '@/components/HelpDocs';
 import { LayoutPanelLeft, Columns2, Copy, Check, Trash2, Minimize2, AlertCircle, CheckCircle2, Wrench, Eye, Upload, Undo2, Redo2, X, ClipboardPaste, Keyboard, Share2 } from 'lucide-react';
 
 function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedData, theme, validationErrors = [], onValidationErrorsChange }) {
@@ -746,7 +748,9 @@ export default function JsonFormatter() {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [showContact, setShowContact] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
 
   // Load JSON from URL hash on mount (share via URL)
@@ -881,7 +885,7 @@ export default function JsonFormatter() {
   return (
     <div className="flex flex-col min-h-screen" style={{ background: bg0, color: isLight ? '#334155' : '#cbd5e1' }} data-theme={theme}>
       <div className="flex flex-col h-[100dvh] overflow-hidden mono-grid flex-shrink-0">
-      <TopBar theme={theme} onThemeToggle={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />
+      <TopBar theme={theme} onThemeToggle={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} onHelpClick={() => setShowHelp(true)} />
 
       {/* Toolbar */}
       <div className="flex items-center justify-between px-3 sm:px-6 h-10 border-b flex-shrink-0"
@@ -1047,33 +1051,154 @@ export default function JsonFormatter() {
       <div className="w-full border-t flex-1 font-sans" style={{ background: isLight ? '#ffffff' : '#0f172a', borderColor }}>
         <div className="max-w-5xl mx-auto px-6 py-16">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="md:col-span-2 space-y-8">
+            <div className="md:col-span-2 space-y-10">
               <section>
-                <h1 className="text-3xl font-bold mb-4" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Free Online JSON Formatter to Prettify JSON</h1>
+                <h1 className="text-3xl font-bold mb-4" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Free Online JSON Formatter &amp; Validator</h1>
                 <p className="leading-relaxed mb-4">
-                  PrettyJSON is a powerful, secure, and free online tool designed for developers to format, validate, parse, and <strong>pretty print JSON</strong> data. 
-                  Whether you are debugging API responses, formatting configuration files, or simply need a fast <strong>JSON pretty formatter</strong> to clean up messy payloads, our tool provides an intuitive interface to make your work easier.
+                  PrettyJSON is a free tool that helps developers <strong>format, validate, and explore JSON data</strong> right inside the browser. If you've ever wrestled with a minified API response or a 5,000-line config file, you know how painful raw JSON can be to read. Paste it here, hit Format, and everything snaps into place with proper indentation and line breaks.
                 </p>
                 <p className="leading-relaxed">
-                  Unlike other tools, PrettyJSON processes all your data locally in your browser. Your JSON data is never sent to our servers, ensuring complete privacy and security for your sensitive information.
+                  What makes PrettyJSON different from most online formatters? <strong>Your data never leaves your computer.</strong> All the parsing, validation, and formatting happens locally in JavaScript. There's no server, no upload, no logging. You can even go offline after loading the page and it keeps working.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-xl font-bold mb-3" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Key Features</h2>
-                <ul className="list-disc pl-5 space-y-2">
-                  <li><strong>Format & Prettify:</strong> Instantly convert minified or messy strings into beautifully indented, readable syntax with our <strong>pretty print JSON</strong> engine.</li>
-                  <li><strong>Validate & Auto-Repair:</strong> Detect syntax errors instantly. Our auto-repair feature can fix common mistakes like missing quotes, trailing commas, and unescaped characters.</li>
-                  <li><strong>Tree & Table Views:</strong> Visualize complex nested objects and arrays with our interactive Tree viewer, or flatten your data into a Table.</li>
-                  <li><strong>JSON Diff:</strong> Compare two JSON files side-by-side to highlight additions, deletions, and modifications.</li>
+                <h2 className="text-2xl font-bold mb-4" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>How It Works</h2>
+                <div className="space-y-4">
+                  <p className="leading-relaxed">It takes about ten seconds to get started:</p>
+                  <ol className="list-decimal pl-5 space-y-3">
+                    <li><strong>Paste or drop your JSON</strong> into the editor on the left. You can also click Load to upload a <code className="px-1 py-0.5 rounded text-xs bg-blue-500/10 text-blue-500 font-mono">.json</code> file from your hard drive.</li>
+                    <li><strong>Click Format</strong> to add clean indentation, or <strong>Min</strong> to compress everything into a single line for production use.</li>
+                    <li><strong>Check the error bar</strong> at the bottom. If something is wrong with your JSON, it tells you exactly where. Click "Auto Repair" to let the tool fix common mistakes, or "Show me" to jump to the error.</li>
+                    <li><strong>Switch views</strong> — Tree mode shows a collapsible hierarchy for navigating nested data, and Table mode presents arrays as a sortable spreadsheet.</li>
+                  </ol>
+                </div>
+              </section>
+
+              <section>
+                <h2 className="text-2xl font-bold mb-4" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>What You Can Do With PrettyJSON</h2>
+                <ul className="list-disc pl-5 space-y-3">
+                  <li><strong>Prettify messy JSON</strong> — turn a wall of minified text into readable, indented code with one click.</li>
+                  <li><strong>Fix broken syntax</strong> — the auto-repair engine handles trailing commas, single quotes, unquoted keys, JavaScript comments, JSONP wrappers, and more. It's powered by the <a href="https://github.com/josdejong/jsonrepair" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">jsonrepair</a> library.</li>
+                  <li><strong>Search across large files</strong> — find keys or values in documents over 10 MB with real-time highlighting of every match.</li>
+                  <li><strong>Browse with Tree view</strong> — expand and collapse nodes to explore deeply nested objects without scrolling through thousands of lines.</li>
+                  <li><strong>Analyze in Table view</strong> — arrays of objects appear as sortable rows and columns, making patterns easy to spot.</li>
+                  <li><strong>Diff two files</strong> — paste two JSON documents side by side and the diff highlights exactly what was added, removed, or changed.</li>
+                  <li><strong>Query with JSONPath or JMESPath</strong> — extract the specific fields you need from complex data using powerful query languages.</li>
+                  <li><strong>Export to CSV</strong> — convert JSON arrays to spreadsheet-friendly CSV files for use in Excel or Google Sheets.</li>
+                  <li><strong>Share via link</strong> — compress your JSON into a URL and send it to a colleague. They open the link and see your data instantly — nothing is stored on any server.</li>
+                  <li><strong>Work in dark mode</strong> — a single click switches to a dark theme that's easier on the eyes during late-night debugging.</li>
                 </ul>
               </section>
 
               <section>
-                <h2 className="text-xl font-bold mb-3" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>What is JSON?</h2>
-                <p className="leading-relaxed">
-                  JSON (JavaScript Object Notation) is a lightweight data-interchange format that is easy for humans to read and write and easy for machines to parse and generate. It is widely used in APIs, configuration files, and data storage.
+                <h2 className="text-2xl font-bold mb-4" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>A Quick Primer on JSON</h2>
+                <p className="leading-relaxed mb-4">
+                  JSON stands for JavaScript Object Notation. It was originally derived from JavaScript, but today it's a language-independent standard defined by <a href="https://www.ecma-international.org/publications-and-standards/standards/ecma-404/" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">ECMA-404</a> and <a href="https://datatracker.ietf.org/doc/html/rfc8259" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">RFC 8259</a>. Every major programming language can read and write it.
                 </p>
+                <p className="leading-relaxed mb-4">
+                  There are six data types: <strong>strings</strong> (always in double quotes), <strong>numbers</strong>, <strong>booleans</strong> (<code className="px-1 py-0.5 rounded text-xs bg-blue-500/10 text-blue-500 font-mono">true</code> / <code className="px-1 py-0.5 rounded text-xs bg-blue-500/10 text-blue-500 font-mono">false</code>), <strong>null</strong>, <strong>objects</strong> (curly braces with key-value pairs), and <strong>arrays</strong> (square brackets with ordered values). Because objects and arrays can nest inside each other, JSON can represent anything from a flat list of names to a complex API response with dozens of levels.
+                </p>
+                <p className="leading-relaxed">
+                  You'll run into JSON everywhere — REST and GraphQL API payloads, package managers (<code className="px-1 py-0.5 rounded text-xs bg-blue-500/10 text-blue-500 font-mono">package.json</code>), TypeScript config (<code className="px-1 py-0.5 rounded text-xs bg-blue-500/10 text-blue-500 font-mono">tsconfig.json</code>), NoSQL databases like MongoDB, logging pipelines, and cloud infrastructure templates.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-2xl font-bold mb-4" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Five JSON Mistakes Almost Everyone Makes</h2>
+                <p className="leading-relaxed mb-4">If you've spent any time editing JSON by hand, you've probably hit at least one of these. PrettyJSON catches all of them — and the auto-repair feature can fix most of them on its own.</p>
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>1. Trailing Commas</h3>
+                    <p className="leading-relaxed">In JavaScript, you can leave a comma after the last item in an array or object. In JSON, that's a syntax error. Easy to miss when you delete or reorder lines.</p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>2. Single Quotes</h3>
+                    <p className="leading-relaxed">JSON only accepts double quotes. If you copy a JavaScript object literal and forget to switch the quotes, the parser will reject it.</p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>3. Unquoted Property Names</h3>
+                    <p className="leading-relaxed">Writing <code className="px-1 py-0.5 rounded text-xs bg-blue-500/10 text-blue-500 font-mono">{`{name: "Alice"}`}</code> is fine in JavaScript, but JSON needs <code className="px-1 py-0.5 rounded text-xs bg-blue-500/10 text-blue-500 font-mono">{`{"name": "Alice"}`}</code>. Every key must be a double-quoted string.</p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>4. Comments</h3>
+                    <p className="leading-relaxed">JSON doesn't support comments — no <code className="px-1 py-0.5 rounded text-xs bg-blue-500/10 text-blue-500 font-mono">//</code>, no <code className="px-1 py-0.5 rounded text-xs bg-blue-500/10 text-blue-500 font-mono">{`/* */`}</code>. Some tools use JSONC (JSON with Comments), but if you paste that into a strict JSON parser, it'll choke.</p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>5. Missing Closing Brackets</h3>
+                    <p className="leading-relaxed">When you're nesting objects three or four levels deep, it's really easy to forget a closing <code className="text-xs font-mono">{`}`}</code> or <code className="text-xs font-mono">]</code>. The error message usually points you to the end of the file, which isn't very helpful — that's why PrettyJSON's "Show me" button jumps to the actual problem.</p>
+                  </div>
+                </div>
+              </section>
+
+              <section>
+                <h2 className="text-2xl font-bold mb-4" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Who Uses PrettyJSON?</h2>
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Backend and Frontend Developers</h3>
+                    <p className="leading-relaxed">When you're building or consuming APIs, you constantly need to inspect JSON payloads. Paste a minified response, format it, and search for the field you care about. The Tree view makes it easy to drill into deeply nested response bodies without losing your place.</p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>DevOps and Cloud Engineers</h3>
+                    <p className="leading-relaxed">JSON powers everything from Terraform state files to AWS CloudFormation templates. PrettyJSON's diff view is handy for comparing config versions before a deployment, and the validator catches syntax errors before they cause a failed rollout.</p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Data Analysts</h3>
+                    <p className="leading-relaxed">Got a JSON dump from an API or database export? Use Table mode to see it as a spreadsheet, run a JMESPath query to pull out the columns you need, and export to CSV for further work in Excel or a visualization tool.</p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Students and Educators</h3>
+                    <p className="leading-relaxed">If you're learning about JSON, web APIs, or data formats, PrettyJSON is a great sandbox. Paste some sample data, break the syntax on purpose, watch the validator explain what's wrong, then use auto-repair to see how it gets fixed. Seeing the same data in Text, Tree, and Table views builds a solid understanding of how JSON structures work.</p>
+                  </div>
+                </div>
+              </section>
+
+              <section>
+                <h2 className="text-2xl font-bold mb-4" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Frequently Asked Questions</h2>
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>What exactly is JSON used for?</h3>
+                    <p className="leading-relaxed">
+                      JSON is the most popular format for sending data between a web server and a browser. It's also used for configuration files (like <code className="px-1 py-0.5 rounded text-xs bg-blue-500/10 text-blue-500 font-mono">package.json</code> in Node.js projects), NoSQL databases, logging, and pretty much any situation where two systems need to exchange structured data.
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Is my data private when I use PrettyJSON?</h3>
+                    <p className="leading-relaxed">
+                      Yes. Everything happens in your browser — your JSON never gets sent to our servers or any third party. If you want to verify this, open DevTools (F12), go to the Network tab, and paste some JSON. You'll see zero outgoing requests containing your data.
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>What's the biggest file PrettyJSON can handle?</h3>
+                    <p className="leading-relaxed">
+                      We've tested it with files up to 10 MB. Most online formatters struggle above 1-2 MB, but PrettyJSON uses optimized rendering to stay responsive even with hundreds of thousands of keys. For the smoothest experience with very large files, use Text mode.
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>How does the auto-repair feature work?</h3>
+                    <p className="leading-relaxed">
+                      It uses the open-source <a href="https://github.com/josdejong/jsonrepair" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">jsonrepair</a> library. When you click "Auto Repair," the library scans your text, identifies syntax issues, and applies fixes — adding missing quotes, removing trailing commas, stripping comments, etc. The repaired result replaces your original text.
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Can I use PrettyJSON without an internet connection?</h3>
+                    <p className="leading-relaxed">
+                      Once the page has loaded, yes. Every feature — formatting, validation, tree browsing, search, diff, export — runs entirely in your browser. The only things that need internet are the initial page load and advertisements.
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Which browsers work with PrettyJSON?</h3>
+                    <p className="leading-relaxed">
+                      All modern browsers — Chrome, Firefox, Safari, Edge, and Opera. We recommend keeping your browser up to date for the best performance and security.
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Is PrettyJSON really free?</h3>
+                    <p className="leading-relaxed">
+                      Completely. There are no premium tiers, no feature gates, and no signup required. The site is supported by ads, and every single feature is available to everyone.
+                    </p>
+                  </div>
+                </div>
               </section>
             </div>
 
@@ -1090,6 +1215,12 @@ export default function JsonFormatter() {
                   <li>
                     <button onClick={() => setShowAbout(true)} className="hover:underline text-blue-500">About PrettyJSON</button>
                   </li>
+                  <li>
+                    <button onClick={() => setShowContact(true)} className="hover:underline text-blue-500">Contact Us</button>
+                  </li>
+                  <li>
+                    <button onClick={() => setShowHelp(true)} className="hover:underline text-blue-500">Documentation & Help</button>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -1105,9 +1236,11 @@ export default function JsonFormatter() {
       <PrivacyPolicy open={showPrivacy} onClose={() => setShowPrivacy(false)} theme={theme} />
       <TermsOfService open={showTerms} onClose={() => setShowTerms(false)} theme={theme} />
       <AboutUs open={showAbout} onClose={() => setShowAbout(false)} theme={theme} />
+      <ContactUs open={showContact} onClose={() => setShowContact(false)} theme={theme} />
 
       {/* Keyboard Shortcuts Overlay */}
       <KeyboardShortcuts open={showShortcuts} onClose={() => setShowShortcuts(false)} theme={theme} />
+      <HelpDocs open={showHelp} onClose={() => setShowHelp(false)} theme={theme} />
     </div>
   );
 }

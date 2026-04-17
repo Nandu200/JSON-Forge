@@ -1,7 +1,7 @@
 import React from 'react';
-import { Braces, Sun, Moon } from 'lucide-react';
+import { Braces, Sun, Moon, HelpCircle } from 'lucide-react';
 
-export default function TopBar({ theme, onThemeToggle }) {
+export default function TopBar({ theme, onThemeToggle, onHelpClick }) {
   const isLight = theme === 'light';
   return (
     <header className="flex items-center justify-between px-4 sm:px-6 h-12 sm:h-14 border-b flex-shrink-0"
@@ -19,6 +19,17 @@ export default function TopBar({ theme, onThemeToggle }) {
       </div>
 
       <div className="flex items-center gap-2">
+        <button
+          onClick={onHelpClick}
+          title="Documentation & Help"
+          className="w-9 h-9 flex items-center justify-center rounded-lg border transition-all"
+          style={{
+            background: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.08)',
+            borderColor: isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.12)',
+          }}
+        >
+          <HelpCircle size={15} className={isLight ? 'text-slate-500' : 'text-slate-300'} />
+        </button>
         <button
           onClick={onThemeToggle}
           title="Toggle light/dark mode"

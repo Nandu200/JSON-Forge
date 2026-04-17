@@ -156,6 +156,70 @@
   outline-color: #d97706;
 }
 
+/* Help Documentation Content */
+.help-content h4 {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+}
+.help-content h4:first-child {
+  margin-top: 0;
+}
+.help-content p {
+  margin-bottom: 0.5rem;
+}
+.help-content ul, .help-content ol {
+  padding-left: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+.help-content ul { list-style-type: disc; }
+.help-content ol { list-style-type: decimal; }
+.help-content li {
+  margin-bottom: 0.35rem;
+}
+.help-content code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8em;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+.help-content a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+.help-content a:hover {
+  color: #2563eb;
+}
+.help-content .faq-item {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+}
+.help-content .faq-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.help-content .shortcuts-table table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+.help-content .shortcuts-table th,
+.help-content .shortcuts-table td {
+  text-align: left;
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+  font-size: 0.85rem;
+}
+.help-content .shortcuts-table th {
+  font-weight: 600;
+  opacity: 0.7;
+}
+
 /* Code Editor */
 .code-editor {
   font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
