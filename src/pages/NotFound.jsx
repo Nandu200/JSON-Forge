@@ -1,8 +1,17 @@
 import { Link, useOutletContext } from 'react-router-dom';
+import { useEffect } from 'react';
 
 export default function NotFound() {
   const { theme } = useOutletContext();
   const isLight = theme === 'light';
+
+  // Tell search engines not to index 404 pages (SPA returns HTTP 200)
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="robots"]');
+    const prev = meta?.getAttribute('content');
+    if (meta) meta.setAttribute('content', 'noindex, nofollow');
+    return () => { if (meta && prev) meta.setAttribute('content', prev); };
+  }, []);
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-6 py-20 text-center">

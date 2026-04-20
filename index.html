@@ -20,6 +20,8 @@
     
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="PrettyJSON" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:url" content="https://prettyjson.org/" />
     <meta property="og:title" content="PrettyJSON — Online JSON Formatter & Pretty Print" />
     <meta property="og:description" content="Free online JSON formatter to prettify, validate, and edit JSON data. Features tree view, table view, diff, and auto-repair." />
@@ -60,12 +62,86 @@
         "Auto-Repair Invalid JSON",
         "Search & Replace",
         "Export to CSV"
+      ],
+      "publisher": {
+        "@type": "Organization",
+        "name": "PrettyJSON",
+        "url": "https://prettyjson.org/"
+      }
+    }
+    </script>
+
+    <!-- FAQ Structured Data for Google Rich Results -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What exactly is JSON used for?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "JSON is the most popular format for sending data between a web server and a browser. It's also used for configuration files (like package.json in Node.js projects), NoSQL databases, logging, and pretty much any situation where two systems need to exchange structured data."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is my data private when I use PrettyJSON?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Everything happens in your browser — your JSON never gets sent to our servers or any third party. You can verify this by opening DevTools (F12), going to the Network tab, and pasting some JSON. You'll see zero outgoing requests containing your data."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What's the biggest file PrettyJSON can handle?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "PrettyJSON has been tested with files up to 10 MB. Most online formatters struggle above 1-2 MB, but PrettyJSON uses optimized rendering to stay responsive even with hundreds of thousands of keys."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the auto-repair feature work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It uses the open-source jsonrepair library. When you click Auto Repair, the library scans your text, identifies syntax issues, and applies fixes — adding missing quotes, removing trailing commas, stripping comments, etc."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use PrettyJSON without an internet connection?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Once the page has loaded, yes. Every feature — formatting, validation, tree browsing, search, diff, export — runs entirely in your browser. The only things that need internet are the initial page load and advertisements."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which browsers work with PrettyJSON?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "All modern browsers — Chrome, Firefox, Safari, Edge, and Opera. We recommend keeping your browser up to date for the best performance and security."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is PrettyJSON really free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Completely. There are no premium tiers, no feature gates, and no signup required. The site is supported by ads, and every single feature is available to everyone."
+          }
+        }
       ]
     }
     </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+    <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
+    <link rel="dns-prefetch" href="https://tpc.googlesyndication.com" />
     
     <!-- Google Consent Mode v2 — defaults before AdSense loads -->
     <script>
@@ -76,7 +152,7 @@
         ad_user_data: 'denied',
         ad_personalization: 'denied',
         analytics_storage: 'denied',
-        wait_for_update: 500
+        wait_for_update: 2000
       });
       // Restore consent from previous visit
       if (localStorage.getItem('prettyjson_cookie_consent') === 'accepted') {
@@ -96,8 +172,17 @@
   <body>
     <div id="root"></div>
     <noscript>
-      <h1>Pretty JSON Formatter, Pretty Print & Validator</h1>
-      <p>PrettyJSON is a free online tool to prettify, format, validate, compare, and repair JSON data. Features include tree view, table view, side-by-side diff, auto-repair, search & replace, and JSON pretty print.</p>
+      <h1>PrettyJSON — Free Online JSON Formatter, Pretty Print & Validator</h1>
+      <p>PrettyJSON is a free online tool to prettify, format, validate, compare, and repair JSON data. Features include tree view, table view, side-by-side diff, auto-repair, search & replace, and JSON pretty print. All processing happens locally in your browser — your data is never sent to any server.</p>
+      <nav>
+        <ul>
+          <li><a href="/privacy">Privacy Policy</a></li>
+          <li><a href="/terms">Terms of Service</a></li>
+          <li><a href="/about">About PrettyJSON</a></li>
+          <li><a href="/contact">Contact Us</a></li>
+          <li><a href="/help">Documentation & Help</a></li>
+        </ul>
+      </nav>
     </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>

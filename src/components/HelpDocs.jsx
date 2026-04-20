@@ -218,15 +218,13 @@ const sections = [
     title: 'Privacy & Security',
     content: (
       <>
-        <p>We built PrettyJSON with a strict "your data stays on your machine" approach. Here's what that means in practice:</p>
+        <p>PrettyJSON is built with a strict "your data stays on your machine" approach. All parsing, formatting, and validation runs locally in your browser — no servers, no uploads, no tracking.</p>
         <ul>
-          <li><strong>Everything runs in your browser.</strong> When you paste JSON, your browser's JavaScript engine handles the parsing, formatting, and validation. No server is involved. You can disconnect from the internet after the page loads and everything still works.</li>
-          <li><strong>We don't collect your data.</strong> There's no database, no analytics on your JSON content, and no way for us to see what you paste. The only network requests the site makes are for loading the page and displaying ads.</li>
-          <li><strong>No sign-up required.</strong> No accounts, no cookies tracking your editing sessions, no login walls.</li>
-          <li><strong>Auto-save stays local.</strong> Your last document is saved in your browser's localStorage to prevent accidental data loss. That data never leaves your device.</li>
-          <li><strong>HTTPS everywhere.</strong> The whole site runs over a secure connection.</li>
+          <li><strong>No data leaves your device.</strong> Your JSON is never sent anywhere. The only network requests the site makes are for loading the page and ads.</li>
+          <li><strong>No accounts needed.</strong> No sign-up, no login, no cookies tracking what you edit.</li>
+          <li><strong>Local auto-save.</strong> Your last document is saved in your browser's localStorage to prevent accidental data loss.</li>
         </ul>
-        <p>For the full legal details, check out our Privacy Policy — the link is in the footer.</p>
+        <p>For complete details about cookies, GDPR rights, and third-party services, read our <strong>Privacy Policy</strong> (linked in the footer of every page).</p>
       </>
     ),
   },
@@ -334,12 +332,10 @@ export default function HelpDocs() {
                       ? <ChevronDown size={14} className="text-blue-500" />
                       : <ChevronRight size={14} style={{ color: isLight ? '#94a3b8' : '#475569' }} />}
                   </button>
-                  {isExpanded && (
-                    <div className="px-4 pb-4 pt-2 text-sm leading-relaxed help-content"
-                      style={{ color: isLight ? '#334155' : '#cbd5e1' }}>
+                  <div className="px-4 pb-4 pt-2 text-sm leading-relaxed help-content"
+                      style={{ display: isExpanded ? 'block' : 'none', color: isLight ? '#334155' : '#cbd5e1' }}>
                       {section.content}
                     </div>
-                  )}
                 </div>
               );
             })}

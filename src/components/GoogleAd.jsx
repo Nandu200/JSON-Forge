@@ -17,9 +17,10 @@ export default function GoogleAd({
   useEffect(() => {
     if (!adsEnabled || !adSlot || pushed.current) return;
     
-    // Wait for adsbygoogle script to load
     const tryPush = () => {
-      if (!window.adsbygoogle) return false;
+      if (!window.adsbygoogle || !adRef.current) return false;
+      // Only push if the ad container has dimensions
+      if (adRef.current.offsetHeight === 0 && adRef.current.offsetWidth === 0) return false;
       try {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
         pushed.current = true;
@@ -30,10 +31,13 @@ export default function GoogleAd({
       return true;
     };
 
-    // Try immediately, retry after short delay if script not loaded yet
+    // Try immediately, then retry every 500ms up to 10s
     if (!tryPush()) {
-      const timer = setTimeout(tryPush, 1500);
-      return () => clearTimeout(timer);
+      const interval = setInterval(() => {
+        if (tryPush()) clearInterval(interval);
+      }, 500);
+      const maxTimer = setTimeout(() => clearInterval(interval), 10000);
+      return () => { clearInterval(interval); clearTimeout(maxTimer); };
     }
   }, [adsEnabled, adSlot]);
 
@@ -46,7 +50,7 @@ export default function GoogleAd({
     <ins
       ref={adRef}
       className="adsbygoogle"
-      style={style}
+      style={{ display: 'block', ...style }}
       data-ad-client={clientId}
       data-ad-slot={adSlot}
       data-ad-format={adFormat}

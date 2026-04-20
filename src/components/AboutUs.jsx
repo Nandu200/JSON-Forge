@@ -52,6 +52,33 @@ export default function AboutUs() {
               Our mission is to provide the best developer experience for working with JSON data. We're constantly working on adding new features like smarter auto-repair, better side-by-side diffing, and advanced tree views.
             </p>
           </section>
+
+          <section>
+            <h2 className="font-semibold text-base mb-2">How PrettyJSON Works</h2>
+            <p>
+              When you paste or upload JSON into PrettyJSON, your browser's built-in JavaScript engine handles everything — parsing, formatting, validation, and rendering. The entire application is a single-page app built with React and served as static files from Cloudflare's global edge network. That means sub-50ms load times for most users worldwide, and zero server-side processing of your data.
+            </p>
+            <p className="mt-2">
+              Under the hood, PrettyJSON uses a custom rendering pipeline optimized for large documents. Instead of rendering every node at once, we virtualize the tree and table views so only visible elements are in the DOM. This lets us handle files well above 5 MB without the browser slowing down.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="font-semibold text-base mb-2">Why We Built This</h2>
+            <p>
+              The idea for PrettyJSON came from a frustrating discovery: many popular online JSON tools quietly send your pasted data to their servers for processing. If you're working with API keys, database credentials, or customer data, that's a serious privacy risk. We wanted a tool that's genuinely client-side — not "client-side with a telemetry endpoint" but truly offline-capable once loaded.
+            </p>
+            <p className="mt-2">
+              We also wanted something that feels like a real desktop application. Most web-based formatters are bare-bones text boxes. PrettyJSON gives you tree navigation, table views, a full diff engine, JSONPath and JMESPath querying, export to multiple formats, and keyboard shortcuts — all in the browser.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="font-semibold text-base mb-2">What's Next</h2>
+            <p>
+              We're actively developing new capabilities. On the roadmap: JSON Schema validation with inline error annotations, a visual schema editor, improved diff with merge support, collaborative sharing via encrypted links, and a browser extension for formatting JSON responses directly in DevTools. Have a feature request? <a href="/contact" className="text-blue-500 underline">Let us know</a>.
+            </p>
+          </section>
         </div>
       </div>
     </div>
