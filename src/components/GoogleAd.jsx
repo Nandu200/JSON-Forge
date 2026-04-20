@@ -12,7 +12,7 @@ export default function GoogleAd({
   const adRef = useRef(null);
   const pushed = useRef(false);
   const adsEnabled = import.meta.env.VITE_ADS_ENABLED !== 'false';
-  const clientId = import.meta.env.VITE_ADSENSE_CLIENT;
+  const clientId = import.meta.env.VITE_ADSENSE_CLIENT || 'ca-pub-3242929685798236';
 
   useEffect(() => {
     if (!adsEnabled || !adSlot || pushed.current) return;

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { formatJSON, minifyJSON, syntaxHighlight } from '@/utils/jsonUtils';
 import { parseJSONSafe, getDepthSafe, countKeysSafe, SIZE_LIMITS } from '@/utils/optimizedJsonUtils';
 import { autoFixJSON } from '@/utils/schemaValidation';
@@ -13,12 +14,7 @@ import FilterBar from '@/components/json/FilterBar';
 import ExportDialog from '@/components/json/ExportDialog';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import GoogleAd from '@/components/GoogleAd';
-import PrivacyPolicy from '@/components/PrivacyPolicy';
-import TermsOfService from '@/components/TermsOfService';
-import AboutUs from '@/components/AboutUs';
-import ContactUs from '@/components/ContactUs';
 import KeyboardShortcuts from '@/components/json/KeyboardShortcuts';
-import HelpDocs from '@/components/HelpDocs';
 import { LayoutPanelLeft, Columns2, Copy, Check, Trash2, Minimize2, AlertCircle, CheckCircle2, Wrench, Eye, Upload, Undo2, Redo2, X, ClipboardPaste, Keyboard, Share2 } from 'lucide-react';
 
 function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedData, theme, validationErrors = [], onValidationErrorsChange }) {
@@ -730,6 +726,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
 }
 
 export default function JsonFormatter() {
+  const { theme } = useOutletContext();
   const [leftValue, setLeftValue] = useState(() => sessionStorage.getItem('prettyjson_left') || '');
   const [rightValue, setRightValue] = useState(() => sessionStorage.getItem('prettyjson_right') || '');
   const [leftData, setLeftData] = useState(null);
@@ -737,20 +734,8 @@ export default function JsonFormatter() {
   const [leftValidationErrors, setLeftValidationErrors] = useState([]);
   const [rightValidationErrors, setRightValidationErrors] = useState([]);
   const [layout, setLayout] = useState(() => localStorage.getItem('prettyjson_layout') || 'single');
-  const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem('prettyjson_theme');
-    if (saved) return saved;
-    // System theme detection for first-time visitors
-    if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) return 'dark';
-    return 'light';
-  });
   const [showAd, setShowAd] = useState(true);
-  const [showPrivacy, setShowPrivacy] = useState(false);
-  const [showTerms, setShowTerms] = useState(false);
-  const [showAbout, setShowAbout] = useState(false);
-  const [showContact, setShowContact] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
 
   // Load JSON from URL hash on mount (share via URL)
@@ -790,9 +775,6 @@ export default function JsonFormatter() {
   useEffect(() => {
     localStorage.setItem('prettyjson_layout', layout);
   }, [layout]);
-  useEffect(() => {
-    localStorage.setItem('prettyjson_theme', theme);
-  }, [theme]);
 
   const isLight = theme === 'light';
   // Improved color palette with better contrast
@@ -883,10 +865,8 @@ export default function JsonFormatter() {
   }, [leftValue]);
 
   return (
-    <div className="flex flex-col min-h-screen" style={{ background: bg0, color: isLight ? '#334155' : '#cbd5e1' }} data-theme={theme}>
-      <div className="flex flex-col h-[100dvh] overflow-hidden mono-grid flex-shrink-0">
-      <TopBar theme={theme} onThemeToggle={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} onHelpClick={() => setShowHelp(true)} />
-
+    <div className="flex flex-col flex-1 w-full relative">
+      <div className="flex flex-col h-[calc(100vh-3rem)] sm:h-[calc(100vh-3.5rem)] overflow-hidden mono-grid flex-shrink-0" style={{ background: bg0, color: isLight ? '#334155' : '#cbd5e1' }}>
       {/* Toolbar */}
       <div className="flex items-center justify-between px-3 sm:px-6 h-10 border-b flex-shrink-0"
         style={{ background: bgBar, borderColor }}>
@@ -981,7 +961,7 @@ export default function JsonFormatter() {
         <div className="hidden lg:flex flex-col flex-shrink-0 w-[300px] p-3 pl-0 gap-3 items-start">
           <div className="w-full rounded-xl overflow-hidden border" style={{ borderColor }}>
             <GoogleAd
-              adSlot={import.meta.env.VITE_AD_SLOT_TOP}
+              adSlot={import.meta.env.VITE_AD_SLOT_TOP || '4922405835'}
               style={{ display: 'block', width: '300px', height: '250px' }}
               adFormat="rectangle"
               fullWidthResponsive={false}
@@ -1007,7 +987,7 @@ export default function JsonFormatter() {
           </button>
           <div className="flex justify-center px-4 py-2">
             <GoogleAd
-              adSlot={import.meta.env.VITE_AD_SLOT_BOTTOM}
+              adSlot={import.meta.env.VITE_AD_SLOT_BOTTOM || '5311521714'}
               style={{ display: 'block', width: '100%', maxWidth: '728px', height: '60px' }}
               adFormat="horizontal"
             />
@@ -1020,14 +1000,6 @@ export default function JsonFormatter() {
         style={{ background: bg0, borderColor }}>
         <div className="flex items-center gap-3">
           <span className="text-[11px] font-mono" style={{ color: isLight ? '#64748b' : '#64748b' }}>PrettyJSON v1.0</span>
-          <span style={{ color: isLight ? '#cbd5e1' : '#334155' }}>·</span>
-          <button
-            onClick={() => setShowPrivacy(true)}
-            className="text-[11px] font-mono hover:underline"
-            style={{ color: isLight ? '#64748b' : '#64748b' }}
-          >
-            Privacy Policy
-          </button>
         </div>
         <div className="flex items-center gap-4">
           {leftData && (
@@ -1047,11 +1019,11 @@ export default function JsonFormatter() {
 
       </div> {/* End of app container */}
 
-      {/* SEO and Footer Section for AdSense/Search Engines */}
-      <div className="w-full border-t flex-1 font-sans" style={{ background: isLight ? '#ffffff' : '#0f172a', borderColor }}>
+      {/* SEO Section for AdSense/Search Engines */}
+      <div className="w-full border-t flex-shrink-0 font-sans" style={{ background: isLight ? '#ffffff' : '#0f172a', borderColor }}>
         <div className="max-w-5xl mx-auto px-6 py-16">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="md:col-span-2 space-y-10">
+            <div className="md:col-span-3 space-y-10">
               <section>
                 <h1 className="text-3xl font-bold mb-4" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Free Online JSON Formatter &amp; Validator</h1>
                 <p className="leading-relaxed mb-4">
@@ -1201,46 +1173,12 @@ export default function JsonFormatter() {
                 </div>
               </section>
             </div>
-
-            <div>
-              <div className="p-6 rounded-xl border" style={{ background: isLight ? '#f8fafc' : '#1e293b', borderColor }}>
-                <h3 className="text-lg font-bold mb-4" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Legal & Resources</h3>
-                <ul className="space-y-3">
-                  <li>
-                    <button onClick={() => setShowPrivacy(true)} className="hover:underline text-blue-500">Privacy Policy</button>
-                  </li>
-                  <li>
-                    <button onClick={() => setShowTerms(true)} className="hover:underline text-blue-500">Terms of Service</button>
-                  </li>
-                  <li>
-                    <button onClick={() => setShowAbout(true)} className="hover:underline text-blue-500">About PrettyJSON</button>
-                  </li>
-                  <li>
-                    <button onClick={() => setShowContact(true)} className="hover:underline text-blue-500">Contact Us</button>
-                  </li>
-                  <li>
-                    <button onClick={() => setShowHelp(true)} className="hover:underline text-blue-500">Documentation & Help</button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          
-          <div className="mt-16 pt-8 border-t text-center text-sm" style={{ borderColor, color: isLight ? '#64748b' : '#94a3b8' }}>
-            <p>&copy; {new Date().getFullYear()} PrettyJSON. All rights reserved.</p>
           </div>
         </div>
       </div>
 
-      {/* Modals */}
-      <PrivacyPolicy open={showPrivacy} onClose={() => setShowPrivacy(false)} theme={theme} />
-      <TermsOfService open={showTerms} onClose={() => setShowTerms(false)} theme={theme} />
-      <AboutUs open={showAbout} onClose={() => setShowAbout(false)} theme={theme} />
-      <ContactUs open={showContact} onClose={() => setShowContact(false)} theme={theme} />
-
       {/* Keyboard Shortcuts Overlay */}
       <KeyboardShortcuts open={showShortcuts} onClose={() => setShowShortcuts(false)} theme={theme} />
-      <HelpDocs open={showHelp} onClose={() => setShowHelp(false)} theme={theme} />
     </div>
   );
 }

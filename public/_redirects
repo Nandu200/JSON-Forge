@@ -1,2 +1,2 @@
 # Cloudflare Workers static asset routing
-# SPA fallback not needed — single route app served at /
+# SPA fallback is handled by wrangler.toml not_found_handling = "single-page-application"

@@ -1,31 +1,21 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import { useOutletContext } from 'react-router-dom';
 
-export default function PrivacyPolicy({ open, onClose, theme }) {
-  if (!open) return null;
+export default function PrivacyPolicy() {
+  const { theme } = useOutletContext();
   const isLight = theme === 'light';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
+    <div className="w-full max-w-3xl mx-auto px-6 py-16 font-sans">
       <div
-        className="relative w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded-xl border p-6 m-4"
+        className="relative w-full rounded-xl border p-8"
         style={{
           background: isLight ? '#ffffff' : '#1e293b',
           borderColor: isLight ? '#e2e8f0' : '#334155',
           color: isLight ? '#0f172a' : '#f1f5f9',
         }}
-        onClick={e => e.stopPropagation()}
       >
-        <button
-          onClick={onClose}
-          className={`absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full transition-all ${
-            isLight ? 'hover:bg-slate-100 text-slate-500' : 'hover:bg-white/10 text-slate-400'
-          }`}
-        >
-          <X size={16} />
-        </button>
-
-        <h1 className="text-xl font-semibold mb-4">Privacy Policy</h1>
+        <h1 className="text-3xl font-bold mb-4">Privacy Policy</h1>
         <p className="text-sm mb-2" style={{ color: isLight ? '#64748b' : '#94a3b8' }}>
           Last updated: April 13, 2026
         </p>

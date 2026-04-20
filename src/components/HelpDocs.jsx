@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { X, ChevronDown, ChevronRight, BookOpen, Layers, Wrench, GitCompare, Search, Download, Keyboard, Shield, HelpCircle } from 'lucide-react';
+import { useOutletContext } from 'react-router-dom';
+import { ChevronDown, ChevronRight, BookOpen, Layers, Wrench, GitCompare, Search, Download, Keyboard, Shield, HelpCircle } from 'lucide-react';
 
 const sections = [
   {
@@ -279,9 +280,9 @@ const sections = [
   },
 ];
 
-export default function HelpDocs({ open, onClose, theme }) {
+export default function HelpDocs() {
+  const { theme } = useOutletContext();
   const [expandedSection, setExpandedSection] = useState('getting-started');
-  if (!open) return null;
   const isLight = theme === 'light';
 
   const toggleSection = (id) => {
@@ -289,15 +290,14 @@ export default function HelpDocs({ open, onClose, theme }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
+    <div className="w-full max-w-4xl mx-auto px-6 py-16 font-sans">
       <div
-        className="relative w-full max-w-4xl max-h-[85vh] overflow-hidden rounded-xl border flex flex-col"
+        className="relative w-full rounded-xl border flex flex-col"
         style={{
           background: isLight ? '#ffffff' : '#1e293b',
           borderColor: isLight ? '#e2e8f0' : '#334155',
           color: isLight ? '#0f172a' : '#f1f5f9',
         }}
-        onClick={e => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b flex-shrink-0"
@@ -306,18 +306,10 @@ export default function HelpDocs({ open, onClose, theme }) {
             <BookOpen size={20} className="text-blue-500" />
             <h1 className="text-lg font-semibold">Documentation & Help</h1>
           </div>
-          <button
-            onClick={onClose}
-            className={`w-8 h-8 flex items-center justify-center rounded-full transition-all ${
-              isLight ? 'hover:bg-slate-100 text-slate-500' : 'hover:bg-white/10 text-slate-400'
-            }`}
-          >
-            <X size={16} />
-          </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div className="px-6 py-4">
           <div className="space-y-1">
             {sections.map(section => {
               const Icon = section.icon;
