@@ -97,11 +97,11 @@ function DiffPanel({ label, lines, diffLines, side, scrollRef, onScroll, isLight
           }
 
           return (
-            <div key={idx} className="flex font-mono text-[13px] leading-[22px]" style={{ background: bg }}>
-              <span className="w-10 text-right pr-2 select-none flex-shrink-0" style={{ background: gutterBg, color: gutterColor }}>
+            <div key={idx} className="flex font-mono text-[11px] md:text-[13px] leading-[20px] md:leading-[22px]" style={{ background: bg }}>
+              <span className="w-8 md:w-10 text-right pr-2 select-none flex-shrink-0" style={{ background: gutterBg, color: gutterColor }}>
                 {lineNum ?? ''}
               </span>
-              <span className="w-4 text-center select-none flex-shrink-0" style={{
+              <span className="w-3 md:w-4 text-center select-none flex-shrink-0" style={{
                 color: marker === '−' ? (isLight ? '#dc2626' : '#f87171') : marker === '+' ? (isLight ? '#059669' : '#34d399') : 'transparent'
               }}>
                 {marker}
@@ -496,7 +496,7 @@ export default function DiffView({ leftData, rightData, leftValue = '', rightVal
         <DiffTreeView leftData={leftData} rightData={rightData} isLight={isLight} />
       ) : (
         /* Two-Panel Line Diff */
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           <DiffPanel
             label="Left (Original)"
             lines={leftLines}
@@ -506,7 +506,7 @@ export default function DiffView({ leftData, rightData, leftValue = '', rightVal
             onScroll={() => syncScroll('left')}
             isLight={isLight}
           />
-          <div className="w-px flex-shrink-0" style={{ background: isLight ? '#e2e8f0' : 'rgba(255,255,255,0.08)' }} />
+          <div className="h-px md:h-auto md:w-px flex-shrink-0" style={{ background: isLight ? '#e2e8f0' : 'rgba(255,255,255,0.08)' }} />
           <DiffPanel
             label="Right (Modified)"
             lines={rightLines}

@@ -59,9 +59,9 @@ export default function FilterBar({
     }`}>
       
       {/* Main Search Bar */}
-      <div className="flex items-center gap-2 px-3 py-1.5">
+      <div className="flex items-center flex-wrap gap-2 px-3 py-1.5">
         {/* Search Input */}
-        <div className={`flex items-center gap-1.5 border rounded px-2 h-7 flex-1 max-w-[300px] ${
+        <div className={`flex items-center gap-1.5 border rounded px-2 h-9 sm:h-7 flex-1 max-w-[200px] sm:max-w-[300px] ${
           isLight 
             ? 'bg-white border-slate-200' 
             : 'bg-white/[0.04] border-white/[0.06]'
@@ -93,7 +93,7 @@ export default function FilterBar({
               <button 
                 onClick={onSearchPrev}
                 disabled={searchMatchCount === 0}
-                className={`p-1.5 rounded transition-colors disabled:opacity-30 ${
+                className={`p-2.5 sm:p-1.5 rounded transition-colors disabled:opacity-30 ${
                   isLight 
                     ? 'hover:bg-slate-200 text-slate-500 hover:text-slate-700' 
                     : 'hover:bg-white/[0.08] text-slate-400 hover:text-slate-200'
@@ -110,7 +110,7 @@ export default function FilterBar({
               <button 
                 onClick={onSearchNext}
                 disabled={searchMatchCount === 0}
-                className={`p-1.5 rounded transition-colors disabled:opacity-30 ${
+                className={`p-2.5 sm:p-1.5 rounded transition-colors disabled:opacity-30 ${
                   isLight 
                     ? 'hover:bg-slate-200 text-slate-500 hover:text-slate-700' 
                     : 'hover:bg-white/[0.08] text-slate-400 hover:text-slate-200'
@@ -244,11 +244,11 @@ export default function FilterBar({
 
       {/* Replace Bar - Only in raw view */}
       {showReplace && showReplaceButton && filter && (
-        <div className={`flex items-center gap-2 px-3 py-1.5 border-t ${
+        <div className={`flex items-center flex-wrap gap-2 px-3 py-1.5 border-t ${
           isLight ? 'border-slate-200' : 'border-white/[0.04]'
         }`}>
           <span className={`text-[10px] font-mono ${isLight ? 'text-slate-500' : 'text-slate-500'}`}>Replace:</span>
-          <div className={`flex items-center gap-1.5 border rounded px-2 h-7 flex-1 max-w-[200px] ${
+          <div className={`flex items-center gap-1.5 border rounded px-2 h-9 sm:h-7 flex-1 max-w-full sm:max-w-[200px] ${
             isLight 
               ? 'bg-white border-slate-200' 
               : 'bg-white/[0.04] border-white/[0.06]'

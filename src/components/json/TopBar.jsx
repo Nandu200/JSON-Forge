@@ -23,7 +23,7 @@ export default function TopBar({ theme, onThemeToggle }) {
         <Link
           to="/help"
           title="Documentation & Help"
-          className="w-9 h-9 flex items-center justify-center rounded-lg border transition-all"
+          className="w-10 h-10 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg border transition-all"
           style={{
             background: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.08)',
             borderColor: isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.12)',
@@ -34,7 +34,7 @@ export default function TopBar({ theme, onThemeToggle }) {
         <button
           onClick={onThemeToggle}
           title="Toggle light/dark mode"
-          className="w-9 h-9 flex items-center justify-center rounded-lg border transition-all"
+          className="w-10 h-10 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg border transition-all"
           style={{
             background: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.08)',
             borderColor: isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.12)',

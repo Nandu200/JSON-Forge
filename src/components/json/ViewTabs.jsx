@@ -22,7 +22,7 @@ export default function ViewTabs({ active, onChange, theme = 'light' }) {
           <button
             key={tab.id}
             onClick={() => onChange(tab.id)}
-            className="flex items-center gap-1.5 px-3 h-7 rounded text-[12px] font-mono transition-all"
+            className="flex items-center gap-1.5 px-3 h-9 sm:h-7 rounded text-[12px] font-mono transition-all"
             style={{
               background: isActive ? (isLight ? 'rgba(59,130,246,0.1)' : 'rgba(59,130,246,0.2)') : 'transparent',
               color: isActive ? '#3b82f6' : (isLight ? '#475569' : '#94a3b8'),

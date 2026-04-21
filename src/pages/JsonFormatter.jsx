@@ -400,7 +400,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
         <div className="flex items-center gap-0.5 flex-shrink-0">
           <button onClick={handleUndo} disabled={!canUndo}
             title="Undo (Ctrl+Z)"
-            className={`w-7 h-7 flex items-center justify-center rounded transition-all disabled:opacity-30 ${
+            className={`w-9 h-9 sm:w-7 sm:h-7 flex items-center justify-center rounded transition-all disabled:opacity-30 ${
               isLight
                 ? 'hover:bg-slate-100 text-slate-600 border border-transparent hover:border-slate-200'
                 : 'hover:bg-white/[0.08] text-slate-300 border border-transparent hover:border-white/[0.1]'
@@ -409,7 +409,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
           </button>
           <button onClick={handleRedo} disabled={!canRedo}
             title="Redo (Ctrl+Shift+Z)"
-            className={`w-7 h-7 flex items-center justify-center rounded transition-all disabled:opacity-30 ${
+            className={`w-9 h-9 sm:w-7 sm:h-7 flex items-center justify-center rounded transition-all disabled:opacity-30 ${
               isLight
                 ? 'hover:bg-slate-100 text-slate-600 border border-transparent hover:border-slate-200'
                 : 'hover:bg-white/[0.08] text-slate-300 border border-transparent hover:border-white/[0.1]'
@@ -915,7 +915,7 @@ export default function JsonFormatter({ hideSeoFooter = false }) {
 
       {/* Panels + right sidebar ad */}
       <div className="flex-1 overflow-hidden flex">
-        <div className="flex-1 overflow-hidden p-2 sm:p-3 gap-2 sm:gap-3 flex flex-col sm:flex-row">
+        <div className="flex-1 overflow-hidden p-2 sm:p-3 gap-2 sm:gap-3 flex flex-col md:flex-row">
           {layout === 'diff' ? (
             /* Full-width diff view spanning both panels */
             <div className="flex-1 min-w-0 overflow-hidden rounded-xl border" style={{ background: bg1, borderColor }}>
@@ -988,8 +988,9 @@ export default function JsonFormatter({ hideSeoFooter = false }) {
           <div className="flex justify-center px-4 py-2">
             <GoogleAd
               adSlot={import.meta.env.VITE_AD_SLOT_BOTTOM || '5311521714'}
-              style={{ display: 'block', width: '100%', maxWidth: '728px', height: '60px' }}
+              style={{ display: 'block', width: '100%', maxWidth: '728px', height: 'auto', minHeight: '50px' }}
               adFormat="horizontal"
+              fullWidthResponsive={true}
             />
           </div>
         </div>
