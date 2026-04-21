@@ -725,7 +725,7 @@ function Panel({ label, value, onChange: onChangeProp, parsedData, otherParsedDa
   );
 }
 
-export default function JsonFormatter() {
+export default function JsonFormatter({ hideSeoFooter = false }) {
   const { theme } = useOutletContext();
   const [leftValue, setLeftValue] = useState(() => sessionStorage.getItem('prettyjson_left') || '');
   const [rightValue, setRightValue] = useState(() => sessionStorage.getItem('prettyjson_right') || '');
@@ -1020,12 +1020,13 @@ export default function JsonFormatter() {
       </div> {/* End of app container */}
 
       {/* SEO Section for AdSense/Search Engines */}
+      {!hideSeoFooter && (
       <div className="w-full border-t flex-shrink-0 font-sans" style={{ background: isLight ? '#ffffff' : '#0f172a', borderColor }}>
         <div className="max-w-5xl mx-auto px-6 py-16">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="md:col-span-3 space-y-10">
               <section>
-                <h1 className="text-3xl font-bold mb-4" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Free Online JSON Formatter &amp; Validator</h1>
+                <h1 className="text-3xl font-bold mb-4" style={{ color: isLight ? '#0f172a' : '#f8fafc' }}>Free Online JSON Formatter, Validator &amp; Beautifier</h1>
                 <p className="leading-relaxed mb-4">
                   PrettyJSON is a free tool that helps developers <strong>format, validate, and explore JSON data</strong> right inside the browser. If you've ever wrestled with a minified API response or a 5,000-line config file, you know how painful raw JSON can be to read. Paste it here, hit Format, and everything snaps into place with proper indentation and line breaks.
                 </p>
@@ -1176,6 +1177,7 @@ export default function JsonFormatter() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Keyboard Shortcuts Overlay */}
       <KeyboardShortcuts open={showShortcuts} onClose={() => setShowShortcuts(false)} theme={theme} />

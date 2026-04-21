@@ -20,8 +20,36 @@ export default function Layout() {
   useEffect(() => {
     const pageMeta = {
       '/': {
-        title: 'PrettyJSON — Online JSON Formatter, Pretty Print & Validator',
-        description: 'Free online JSON formatter to prettify, validate, and edit JSON data. Features tree view, side-by-side diff, auto-repair, and JSON pretty print.',
+        title: 'JSON Formatter Online — Free JSON Validator, Beautifier & Viewer | PrettyJSON',
+        description: 'Free online JSON formatter, validator, and beautifier. Paste JSON to format, minify, diff, view as tree, edit, and export to CSV. 100% client-side — your data never leaves your browser.',
+      },
+      '/json-validator': {
+        title: 'JSON Validator Online — Free JSON Lint & Syntax Checker | PrettyJSON',
+        description: 'Free online JSON validator and lint checker. Paste JSON to find syntax errors instantly. Auto-repair trailing commas, single quotes, missing brackets, and more. 100% client-side.',
+      },
+      '/json-beautifier': {
+        title: 'JSON Beautifier Online — Free JSON Pretty Printer | PrettyJSON',
+        description: 'Free online JSON beautifier and pretty printer. Paste minified JSON to add clean indentation and line breaks. 2-space formatting, instant results. No data sent to servers.',
+      },
+      '/json-viewer': {
+        title: 'JSON Viewer Online — Free JSON Tree Explorer | PrettyJSON',
+        description: 'Free online JSON viewer with interactive tree and table views. Explore deeply nested JSON, search keys and values, filter with JSONPath. Works offline in your browser.',
+      },
+      '/json-diff': {
+        title: 'JSON Diff Online — Free JSON Compare Tool | PrettyJSON',
+        description: 'Free online JSON diff and compare tool. Paste two JSON documents side by side to see additions, deletions, and changes highlighted. Works with nested objects and arrays.',
+      },
+      '/json-to-csv': {
+        title: 'JSON to CSV Converter Online — Free JSON Export | PrettyJSON',
+        description: 'Free online JSON to CSV converter. Convert JSON arrays to spreadsheet-friendly CSV for Excel and Google Sheets. Handles nested objects with dot-notation flattening.',
+      },
+      '/json-minifier': {
+        title: 'JSON Minifier Online — Free JSON Compressor | PrettyJSON',
+        description: 'Free online JSON minifier and compressor. Strip whitespace to reduce file size for production. One-click minification with instant results. No data leaves your browser.',
+      },
+      '/json-editor': {
+        title: 'JSON Editor Online — Free Browser-Based JSON Editor | PrettyJSON',
+        description: 'Free online JSON editor with syntax highlighting, auto-repair, tree editing, search & replace, and undo/redo. Edit JSON directly in your browser — no installation or sign-up.',
       },
       '/privacy': {
         title: 'Privacy Policy — PrettyJSON',
@@ -45,8 +73,8 @@ export default function Layout() {
       },
     };
     const meta = pageMeta[location.pathname] || {
-      title: 'PrettyJSON — Online JSON Formatter',
-      description: 'Free online JSON formatter to prettify, validate, and edit JSON data.',
+      title: 'JSON Formatter Online — Free JSON Validator & Beautifier | PrettyJSON',
+      description: 'Free online JSON formatter, validator, and beautifier. Paste JSON to format, minify, diff, view as tree, edit, and export to CSV.',
     };
     document.title = meta.title;
     const descTag = document.querySelector('meta[name="description"]');
